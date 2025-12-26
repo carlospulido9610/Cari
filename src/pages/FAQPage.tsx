@@ -98,30 +98,28 @@ export const FAQPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#fdfdfd] pt-20 pb-10 md:pt-24 md:pb-16 relative overflow-hidden">
-            {/* Ambient Background Elements - Light Theme */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#44b6da]/5 rounded-full blur-[120px] animate-pulse"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#1e3857]/5 rounded-full blur-[120px] animation-delay-2000"></div>
+        <div className="min-h-screen bg-brand-ivory pt-32 pb-20 md:pt-48 md:pb-32 relative overflow-hidden">
+            {/* Background Details */}
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-0 right-1/4 w-px h-full bg-brand-ink/5" />
+                <div className="absolute bottom-1/3 left-0 w-full h-px bg-brand-ink/5" />
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="max-w-4xl mx-auto px-6 lg:px-12 relative z-10">
 
                 {/* Header */}
-                <div className="text-center mb-10 md:mb-16 animate-fade-in-up">
-                    <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-[#f0f9ff] to-[#e0f2fe] rounded-2xl mb-4 md:mb-6 shadow-xl shadow-blue-900/5 transform rotate-3 hover:rotate-0 transition-transform duration-300 border border-white">
-                        <HelpCircle className="w-8 h-8 md:w-10 md:h-10 text-[#1e3857]" />
-                    </div>
-                    <h1 className="text-3xl md:text-5xl font-black text-[#1e3857] mb-4 md:mb-6 tracking-tight">
-                        Preguntas <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#44b6da] to-[#1e3857]">Frecuentes</span>
+                <div className="text-center mb-24 opacity-0 animate-reveal" style={{ animationDelay: '0.1s' }}>
+
+                    <h1 className="text-4xl md:text-6xl font-medium text-brand-ink display-font mb-6">
+                        Preguntas <span className="font-bold">frecuentes</span>
                     </h1>
-                    <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed font-light">
-                        Encuentra respuestas a las preguntas más comunes sobre nuestros productos y servicios textiles.
+                    <p className="text-brand-ink/40 font-light text-lg max-w-2xl mx-auto">
+                        Resolviendo sus dudas técnicas sobre insumos, tiempos de despacho y procesos de personalización de alto nivel.
                     </p>
                 </div>
 
-                {/* Category Filters */}
-                <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 md:mb-12 animate-fade-in-up animation-delay-300">
+                {/* Category Filters - Minimal */}
+                <div className="flex flex-wrap justify-center gap-3 mb-16 opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
                     {categories.map((cat) => {
                         const Icon = cat.icon;
                         const isActive = activeCategory === cat.name;
@@ -133,97 +131,73 @@ export const FAQPage: React.FC = () => {
                                     setOpenIndex(null);
                                 }}
                                 className={`
-                                    group flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 rounded-full font-bold text-xs md:text-sm transition-all duration-300 border
+                                    px-6 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all duration-300
                                     ${isActive
-                                        ? 'bg-[#1e3857] border-[#1e3857] text-white shadow-lg shadow-[#1e3857]/20 translate-y-[-2px]'
-                                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:shadow-md'
+                                        ? 'border-brand-ink bg-brand-ink text-brand-ivory'
+                                        : 'border-brand-ink/5 text-brand-ink/40 hover:border-brand-ink/20'
                                     }
                                 `}
                             >
-                                <Icon className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
                                 {cat.name}
                             </button>
                         );
                     })}
                 </div>
 
-                {/* FAQ Accordion */}
-                <div className="space-y-3 md:space-y-4 animate-fade-in-up animation-delay-500">
+                {/* FAQ Accordion - Minimal Editorial */}
+                <div className="space-y-0 opacity-0 animate-reveal" style={{ animationDelay: '0.3s' }}>
                     {filteredFAQs.map((faq, index) => {
                         const isOpen = openIndex === index;
                         return (
                             <div
                                 key={index}
-                                className={`
-                                    group relative rounded-2xl transition-all duration-300 border
-                                    ${isOpen
-                                        ? 'bg-white border-[#44b6da]/30 shadow-xl shadow-slate-200/50'
-                                        : 'bg-white border-slate-100 hover:border-slate-200 hover:shadow-lg hover:shadow-slate-100'
-                                    }
-                                `}
+                                className={`border-b border-brand-ink/5 transition-colors duration-500 ${isOpen ? 'bg-brand-ink/[0.01]' : ''}`}
                             >
                                 <button
                                     onClick={() => toggleFAQ(index)}
-                                    className="w-full px-5 py-4 md:px-8 md:py-6 flex items-center justify-between text-left transition-all duration-300"
+                                    className="w-full py-8 flex items-center justify-between text-left group"
                                 >
-                                    <span className={`text-base md:text-lg font-bold tracking-tight transition-colors duration-300 pr-4 ${isOpen ? 'text-[#1e3857]' : 'text-slate-700 group-hover:text-[#1e3857]'}`}>
+                                    <span className={`text-lg md:text-xl font-medium display-font transition-colors duration-300 pr-8 ${isOpen ? 'text-brand-ink' : 'text-brand-ink/60 group-hover:text-brand-ink'}`}>
                                         {faq.question}
                                     </span>
-                                    <div className={`
-                                        w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-all duration-300 shrink-0
-                                        ${isOpen ? 'bg-[#44b6da] text-white rotate-180' : 'bg-slate-100 text-slate-400 group-hover:bg-[#e0f2fe] group-hover:text-[#44b6da]'}
-                                    `}>
-                                        <ChevronDown className="w-4 h-4 md:w-5 md:h-5" />
-                                    </div>
+                                    <ChevronDown className={`w-4 h-4 text-brand-ink/20 transition-transform duration-500 ${isOpen ? 'rotate-180 text-brand-accent' : ''}`} />
                                 </button>
 
                                 <div
                                     className={`
-                                        overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
-                                        ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}
+                                        overflow-hidden transition-all duration-500 ease-in-out
+                                        ${isOpen ? 'max-h-[500px] pb-8' : 'max-h-0'}
                                     `}
                                 >
-                                    <div className="px-5 pb-5 md:px-8 md:pb-8">
-                                        <p className="text-slate-600 leading-relaxed text-sm md:text-base font-light">
-                                            {faq.answer}
-                                        </p>
-                                    </div>
+                                    <p className="text-brand-ink/50 leading-relaxed font-light text-lg">
+                                        {faq.answer}
+                                    </p>
                                 </div>
                             </div>
                         );
                     })}
                 </div>
 
-                {/* Contact CTA */}
-                <div className="mt-12 md:mt-20 relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 text-center animate-fade-in-up animation-delay-700 bg-white border border-slate-100 shadow-2xl shadow-slate-200/50">
-                    {/* Decorative blobs inside CTA */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#44b6da]/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#1e3857]/5 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
+                {/* Contact CTA - Premium Finish */}
+                <div className="mt-48 opacity-0 animate-reveal" style={{ animationDelay: '0.4s' }}>
+                    <div className="relative p-12 md:p-20 text-center bg-brand-ink rounded-sm overflow-hidden">
+                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-accent/30 to-transparent"></div>
 
-                    <div className="relative z-10 flex flex-col items-center">
-                        <div className="w-12 h-12 md:w-16 md:h-16 bg-[#e0f2fe] rounded-2xl flex items-center justify-center mb-4 md:mb-6 border border-[#44b6da]/20 rotate-3">
-                            <MessageCircle className="w-6 h-6 md:w-8 md:h-8 text-[#1e3857]" />
-                        </div>
-                        <h3 className="text-2xl md:text-3xl font-black text-[#1e3857] mb-2 md:mb-3 tracking-tight">
-                            ¿Aún tienes dudas?
-                        </h3>
-                        <p className="text-sm md:text-base text-slate-600 mb-6 md:mb-8 max-w-lg font-light">
-                            Nuestro equipo experto en textiles está a un mensaje de distancia para asesorarte de forma personalizada.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center w-full sm:w-auto">
-                            <a
-                                href="/contacto"
-                                className="inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 bg-[#1e3857] hover:bg-[#0f172a] text-white text-sm md:text-base font-bold rounded-full transition-all duration-300 shadow-xl shadow-[#1e3857]/20 hover:scale-105"
-                            >
-                                <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" />
-                                Hablar con un Experto
-                            </a>
-                            <a
-                                href="/cotizar"
-                                className="inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 bg-white hover:bg-slate-50 text-[#1e3857] text-sm md:text-base font-bold rounded-full transition-all duration-300 border-2 border-slate-100 hover:border-[#44b6da]/30 hover:shadow-lg"
-                            >
-                                Solicitar Cotización
-                            </a>
+                        <div className="relative z-10 space-y-8 flex flex-col items-center">
+                            <h3 className="text-3xl md:text-5xl font-medium text-brand-ivory display-font">
+                                ¿Requiere asistencia <span className="font-bold">personalizada?</span>
+                            </h3>
+                            <p className="text-brand-ivory/40 max-w-xl text-lg font-light leading-relaxed">
+                                Nuestros consultores técnicos están disponibles para orientar su elección de insumos según las necesidades de su marca.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-6 justify-center w-full sm:w-auto pt-4">
+                                <a
+                                    href="/contacto"
+                                    className="px-12 py-5 bg-brand-ivory text-brand-ink text-[10px] uppercase tracking-[0.5em] font-bold hover:translate-y-[-2px] transition-all shadow-2xl"
+                                >
+                                    Hablar con el Centro Técnico
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -4,54 +4,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CARI INSUMOS | Suministros Textiles Premium</title>
+  <title>CARI INSUMOS | High-End Textile Supplies</title>
   <meta name="description"
-    content="Suministros textiles al por mayor para profesionales. Telas, hilos, botones y cremalleras." />
+    content="Exclusive textile supplies for professionals. Fabrics, threads, buttons, and zippers redefined." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,container-queries"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Outfit"', 'sans-serif'],
+            serif: ['"Cormorant Garamond"', 'serif'],
           },
           colors: {
             brand: {
-              dark: '#1e3857',
-              light: '#44b6da',
+              ivory: '#FCFBF8',
+              ink: '#0F172A',
+              accent: '#0EA5E9',
+              gold: '#C5A368',
             },
-            primary: {
-              50: '#f0faff',
-              100: '#e0f5fe',
-              500: '#44b6da',
-              600: '#44b6da',
-              900: '#1e3857',
+          },
+          animation: {
+            'reveal': 'reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            reveal: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
             },
-            neutral: {
-              850: '#1f2937',
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
             }
           }
         }
       }
     }
   </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #FCFBF8;
+      overflow-x: hidden;
+    }
+
+    .display-font {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .serif-font {
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.04;
+      z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     }
 
     .glass-nav {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(252, 251, 248, 0.7);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
     }
   </style>
   <script type="module" src="/index.tsx"></script>
 
 </head>
 
-<body class="bg-slate-50 text-slate-800 antialiased">
+<body class="bg-[#FCFBF8] text-[#0F172A] antialiased">
+  <div class="noise-overlay"></div>
   <div id="root"></div>
 </body>
 

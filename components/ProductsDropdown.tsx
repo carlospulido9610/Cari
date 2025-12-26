@@ -39,30 +39,30 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
     };
 
     if (isMobile) {
-        // Mobile accordion style
+        // Mobile accordion style - Integrated with brand aesthetic
         return (
-            <div className="border-b border-slate-100">
+            <div className="border-b border-brand-ink/5">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="w-full flex items-center justify-between px-3 py-3 text-base font-medium text-slate-600 hover:text-[#44b6da] hover:bg-slate-50 rounded-md transition-colors"
+                    className="w-full flex items-center justify-between px-3 py-4 text-[10px] uppercase tracking-[0.3em] font-bold text-brand-ink/60 hover:text-brand-ink transition-colors display-font"
                 >
-                    <span>Productos</span>
-                    <ChevronDown className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                    <span>Catálogo</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-500 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isOpen && (
-                    <div className="pl-4 pb-2 space-y-1">
+                    <div className="pl-4 pb-4 space-y-1">
                         <Link
                             to="/productos"
-                            className="block px-3 py-2 text-sm text-slate-500 hover:text-[#44b6da] hover:bg-slate-50 rounded-md transition-colors"
+                            className="block px-3 py-2 text-[10px] uppercase tracking-widest font-bold text-brand-ink/40 hover:text-brand-accent transition-colors display-font"
                             onClick={handleLinkClick}
                         >
-                            Todos los productos
+                            Ver Todo
                         </Link>
                         {categories.map((category) => (
                             <Link
                                 key={category.id}
                                 to={`/productos?categoria=${category.slug}`}
-                                className="block px-3 py-2 text-sm text-slate-500 hover:text-[#44b6da] hover:bg-slate-50 rounded-md transition-colors"
+                                className="block px-3 py-2 text-[10px] uppercase tracking-widest font-bold text-brand-ink/40 hover:text-brand-accent transition-colors display-font"
                                 onClick={handleLinkClick}
                             >
                                 {category.name}
@@ -74,7 +74,7 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
         );
     }
 
-    // Desktop dropdown
+    // Desktop dropdown - Industrial Luxury Menu
     return (
         <div
             className="relative"
@@ -83,45 +83,45 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
             onMouseLeave={() => setIsOpen(false)}
         >
             <button
-                className={`flex items-center gap-1 font-medium transition-colors text-[15px] ${isOpen ? 'text-[#1e3857]' : 'text-slate-600 hover:text-[#1e3857]'}`}
+                className={`flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold transition-all display-font ${isOpen ? 'text-brand-ink' : 'text-brand-ink/60 hover:text-brand-ink'}`}
                 aria-expanded={isOpen}
             >
-                Productos
-                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                Catálogo
+                <ChevronDown className={`w-3 h-3 transition-transform duration-500 ${isOpen ? 'rotate-180 text-brand-accent' : ''}`} />
             </button>
 
-            {/* Dropdown Menu Wrapper - Uses pt-4 to bridge the gap interaction-wise */}
+            {/* Dropdown Menu Wrapper */}
             <div
-                className={`absolute top-full left-0 pt-4 w-64 z-50 transition-all duration-200 origin-top
-                ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}
+                className={`absolute top-full left-0 pt-6 w-72 z-50 transition-all duration-500
+                ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
             >
-                {/* Visual Card */}
-                <div className="bg-white rounded-2xl shadow-xl shadow-[#1e3857]/10 border border-slate-100 p-2 relative">
-                    {/* Arrow up pointing to menu */}
-                    <div className="absolute -top-1.5 left-8 w-3 h-3 bg-white border-t border-l border-slate-100 transform rotate-45"></div>
+                {/* Visual Card - Editorial Style */}
+                <div className="bg-brand-ivory/95 backdrop-blur-md rounded-sm border border-brand-ink/10 shadow-2xl p-6 relative">
+                    {/* Minimal Accents */}
+                    <div className="absolute top-0 right-0 w-12 h-px bg-brand-accent/20"></div>
+                    <div className="absolute bottom-0 left-0 w-px h-12 bg-brand-accent/20"></div>
 
-                    <div className="flex flex-col">
-                        {/* All Products Link */}
+                    <div className="flex flex-col space-y-2">
+
+
                         <Link
                             to="/productos"
-                            className="px-4 py-3 text-sm font-semibold text-[#1e3857] hover:text-[#44b6da] hover:bg-slate-50 rounded-xl mb-1 flex items-center justify-between group"
+                            className="text-[10px] uppercase tracking-[0.2em] font-bold text-brand-ink/40 hover:text-brand-accent transition-all duration-300 py-2 flex items-center justify-between group"
                             onClick={handleLinkClick}
                         >
-                            Ver todos
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#44b6da]">→</span>
+                            Ver Todo
+                            <span className="w-4 h-px bg-brand-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-right"></span>
                         </Link>
 
-                        <div className="h-px bg-slate-100 my-1 mx-2" />
-
-                        {/* Categories */}
                         {categories.map((category) => (
                             <Link
                                 key={category.id}
                                 to={`/productos?categoria=${category.slug}`}
-                                className="px-4 py-2.5 text-sm text-slate-600 hover:text-[#44b6da] hover:bg-slate-50 rounded-xl transition-colors flex items-center justify-between group"
+                                className="text-[10px] uppercase tracking-[0.2em] font-bold text-brand-ink/60 hover:text-brand-accent transition-all duration-300 py-2 flex items-center justify-between group"
                                 onClick={handleLinkClick}
                             >
                                 {category.name}
+                                <span className="w-4 h-px bg-brand-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-right"></span>
                             </Link>
                         ))}
                     </div>

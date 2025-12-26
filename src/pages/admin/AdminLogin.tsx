@@ -21,28 +21,48 @@ export const AdminLogin: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
-            <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
-                <div className="mx-auto w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-6">
-                    <Lock className="text-white w-8 h-8" />
+        <div className="min-h-screen bg-brand-ivory flex items-center justify-center px-4 relative overflow-hidden">
+            {/* Architectural Background Detail */}
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-ink/[0.02] -skew-x-12 transform origin-top translate-x-20" />
+
+            <div className="relative max-w-md w-full">
+                <div className="bg-white p-12 shadow-[0_40px_100px_rgba(0,0,0,0.05)] border border-brand-ink/5">
+                    <div className="flex flex-col items-center text-center mb-10">
+                        <div className="w-12 h-12 border border-brand-ink flex items-center justify-center mb-8 rotate-45 group hover:rotate-90 transition-transform duration-700">
+                            <Lock className="w-5 h-5 text-brand-ink -rotate-45 group-hover:-rotate-90 transition-transform duration-700" />
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleLogin} className="space-y-8">
+                        <div className="space-y-2">
+                            <label className="text-[9px] uppercase tracking-widest font-bold text-brand-ink/30 ml-1">Clave de Enlace</label>
+                            <input
+                                type="password"
+                                value={key}
+                                onChange={(e) => setKey(e.target.value)}
+                                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                                className="w-full bg-brand-ivory/50 border-b border-brand-ink/10 py-4 px-1 text-center text-lg focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/10 tracking-[0.5em]"
+                            />
+                        </div>
+
+                        {error && (
+                            <p className="text-[10px] uppercase tracking-widest font-bold text-red-500 text-center animate-shake">
+                                {error}
+                            </p>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="w-full py-5 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.5em] font-bold hover:bg-brand-ink/90 transition-all shadow-xl shadow-brand-ink/10"
+                        >
+                            Verificar Identidad
+                        </button>
+                    </form>
                 </div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-2">Acceso Administrativo</h1>
-                <p className="text-slate-500 mb-8">Ingrese su clave de acceso para gestionar el catálogo.</p>
 
-                <form onSubmit={handleLogin} className="space-y-4">
-                    <input
-                        type="password"
-                        value={key}
-                        onChange={(e) => setKey(e.target.value)}
-                        placeholder="Clave de acceso"
-                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
-                    />
-                    {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
-
-                    <Button type="submit" className="w-full">
-                        Ingresar
-                    </Button>
-                </form>
+                <p className="mt-8 text-center text-[9px] uppercase tracking-widest font-bold text-brand-ink/20">
+                    &copy; {new Date().getFullYear()} CARI INSUMOS VENEZUELA
+                </p>
             </div>
         </div>
     );

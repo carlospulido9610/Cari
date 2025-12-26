@@ -77,41 +77,41 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav className="sticky top-4 z-50 flex justify-center px-4 transition-all duration-300 w-full pointer-events-none">
-      <div className={`pointer-events-auto relative z-50 w-full max-w-7xl bg-white/90 backdrop-blur-3xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 px-6 py-4 transition-all duration-300 ${scrolled ? 'py-3 bg-white/95 shadow-[0_8px_30px_rgb(0,0,0,0.08)]' : 'py-4'}`}>
+    <nav className="sticky top-2 md:top-6 z-50 flex justify-center px-2 md:px-6 transition-all duration-500 w-full pointer-events-none">
+      <div className={`pointer-events-auto relative z-50 w-full max-w-7xl bg-brand-ivory/70 backdrop-blur-2xl rounded-2xl shadow-[0_4px_24px_rgba(15,23,42,0.04)] border border-brand-ink/5 px-3 md:px-8 py-4 md:py-5 transition-all duration-500 ${scrolled ? 'py-3 md:py-3.5 bg-brand-ivory/90 shadow-[0_8px_32px_rgba(15,23,42,0.08)]' : 'py-4 md:py-5'}`}>
         <div className="flex justify-between items-center relative">
 
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center cursor-pointer group pr-8">
-            <Logo className="h-12 md:h-16 transition-transform duration-300 group-hover:scale-105" />
+          <Link to="/" className="flex-shrink-0 flex items-center cursor-pointer group pr-10">
+            <Logo className="h-10 md:h-12 transition-transform duration-500 group-hover:scale-105" />
           </Link>
 
           {/* Desktop Menu & Search */}
-          <div className="hidden md:flex items-center flex-1 justify-end space-x-8">
+          <div className="hidden md:flex items-center flex-1 justify-end space-x-10">
 
             {/* Search Input (Animated) */}
-            <div className={`relative flex items-center transition-all duration-300 ease-in-out ${isSearchOpen ? 'w-64' : 'w-10'}`}>
+            <div className={`relative flex items-center transition-all duration-500 ease-out ${isSearchOpen ? 'w-64' : 'w-10'}`}>
               <form
                 onSubmit={handleSearch}
-                className={`absolute right-0 top-1/2 -translate-y-1/2 h-10 bg-slate-50 border border-slate-200 rounded-full flex items-center overflow-hidden transition-all duration-300 ${isSearchOpen ? 'w-full px-4 border-slate-300' : 'w-10 border-transparent bg-transparent'}`}
+                className={`absolute right-0 top-1/2 -translate-y-1/2 h-10 bg-brand-ink/5 border border-brand-ink/10 rounded-full flex items-center overflow-hidden transition-all duration-500 ${isSearchOpen ? 'w-full px-5 border-brand-ink/20 opacity-100' : 'w-10 border-transparent bg-transparent opacity-0 pointer-events-none'}`}
               >
                 <input
                   ref={searchInputRef}
                   type="text"
                   placeholder="Buscar..."
-                  className={`w-full bg-transparent border-none outline-none text-sm text-slate-700 placeholder:text-slate-400 ${isSearchOpen ? 'opacity-100' : 'opacity-0'}`}
+                  className="w-full bg-transparent border-none outline-none text-sm text-brand-ink placeholder:text-brand-ink/40 font-sans"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onBlur={() => !searchQuery && setIsSearchOpen(false)} // Auto close if empty on blur
+                  onBlur={() => !searchQuery && setIsSearchOpen(false)}
                 />
               </form>
 
               {/* Search Toggle Icon */}
               <button
-                className={`absolute right-0 top-1/2 -translate-y-1/2 p-2 text-slate-600 hover:text-[#1e3857] transition-colors rounded-full z-10 ${isSearchOpen ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                className={`absolute right-0 top-1/2 -translate-y-1/2 p-2 text-brand-ink/60 hover:text-brand-ink transition-all rounded-full z-10 ${isSearchOpen ? 'pointer-events-none opacity-0 scale-90' : 'opacity-100 scale-100'}`}
                 onClick={() => setIsSearchOpen(true)}
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-5 h-5 stroke-[1.5px]" />
               </button>
             </div>
 
@@ -119,7 +119,7 @@ export const Navbar: React.FC = () => {
             {/* Links */}
             <Link
               to="/"
-              className="text-slate-600 hover:text-[#1e3857] font-medium text-[15px] transition-colors"
+              className="text-brand-ink/70 hover:text-brand-ink font-medium text-[13px] uppercase tracking-widest transition-all display-font"
             >
               Inicio
             </Link>
@@ -128,23 +128,23 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.name}
                 to={link.path}
-                className="text-slate-600 hover:text-[#1e3857] font-medium text-[15px] transition-colors"
+                className="text-brand-ink/70 hover:text-brand-ink font-medium text-[13px] uppercase tracking-widest transition-all display-font"
               >
                 {link.name}
               </Link>
             ))}
 
             {/* Divider */}
-            <div className="h-8 w-px bg-slate-200 mx-2"></div>
+            <div className="h-4 w-px bg-brand-ink/10 mx-2"></div>
 
             {/* Cart Button */}
             <button
-              className="relative p-2.5 text-slate-600 hover:text-[#1e3857] transition-all hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-100 group"
+              className="relative p-2 text-brand-ink/70 hover:text-brand-ink transition-all group"
               onClick={() => setIsCartOpen(true)}
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-5 h-5 stroke-[1.5px]" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold leading-none text-white bg-[#1e3857] rounded-full shadow-sm group-hover:bg-[#44b6da] transition-colors border-2 border-white">
+                <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold text-brand-ivory bg-brand-ink rounded-full transition-transform group-hover:scale-110">
                   {cartCount}
                 </span>
               )}
@@ -152,25 +152,24 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Actions */}
-          <div className="md:hidden flex items-center gap-1">
-            {/* Mobile Search Toggle */}
+          <div className="md:hidden flex items-center gap-2">
             <button
-              className="p-2 text-slate-600 hover:text-[#1e3857] hover:bg-slate-50 rounded-full transition-colors"
+              className="p-2 text-brand-ink/70 hover:text-brand-ink transition-colors"
               onClick={() => {
                 setMobileSearchOpen(!mobileSearchOpen);
-                setIsOpen(false); // Close menu if opening search
+                setIsOpen(false);
               }}
             >
-              <Search className="w-6 h-6" />
+              <Search className="w-6 h-6 stroke-[1.5px]" />
             </button>
 
             <button
-              className="relative p-2 text-slate-600 hover:text-[#1e3857] transition-colors"
+              className="relative p-2 text-brand-ink/70 hover:text-brand-ink transition-colors"
               onClick={() => setIsCartOpen(true)}
             >
-              <ShoppingBag className="w-6 h-6" />
+              <ShoppingBag className="w-6 h-6 stroke-[1.5px]" />
               {cartCount > 0 && (
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-[#1e3857] rounded-full">
+                <span className="absolute top-1 right-1 inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold text-brand-ivory bg-brand-ink rounded-full">
                   {cartCount}
                 </span>
               )}
@@ -179,33 +178,33 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => {
                 setIsOpen(!isOpen);
-                setMobileSearchOpen(false); // Close search if opening menu
+                setMobileSearchOpen(false);
               }}
-              className="p-2 text-slate-600 hover:text-[#1e3857] hover:bg-slate-50 rounded-full transition-colors focus:outline-none"
+              className="p-2 text-brand-ink/70 hover:text-brand-ink transition-colors focus:outline-none"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? <X size={24} className="stroke-[1.5px]" /> : <Menu size={24} className="stroke-[1.5px]" />}
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Search Bar Dropdown */}
-      <div className={`md:hidden absolute top-full left-0 mt-2 w-full px-4 pointer-events-auto transition-all duration-300 ease-in-out z-40 ${mobileSearchOpen ? 'max-h-24 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4 overflow-hidden'}`}>
-        <div className="bg-white/95 backdrop-blur-xl shadow-xl rounded-2xl border border-white/60 p-3">
+      <div className={`md:hidden absolute top-full left-0 mt-4 w-full px-6 pointer-events-auto transition-all duration-500 ease-out z-40 ${mobileSearchOpen ? 'max-h-24 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4 overflow-hidden'}`}>
+        <div className="bg-brand-ivory/95 backdrop-blur-2xl shadow-2xl rounded-2xl border border-brand-ink/5 p-4">
           <form onSubmit={handleSearch} className="relative">
             <input
               ref={mobileSearchInputRef}
               type="text"
               placeholder="Buscar productos..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#44b6da] focus:border-transparent transition-all text-sm"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-brand-ink/10 bg-brand-ink/5 focus:bg-brand-ivory focus:outline-none focus:ring-1 focus:ring-brand-ink/20 transition-all text-sm font-sans"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-ink/40" />
             <button
               type="button"
               onClick={() => setMobileSearchOpen(false)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-ink/40 hover:text-brand-ink p-1"
             >
               <X className="w-4 h-4" />
             </button>
@@ -216,21 +215,19 @@ export const Navbar: React.FC = () => {
       {/* Mobile Menu Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40 md:hidden pointer-events-auto backdrop-blur-sm"
+          className="fixed inset-0 bg-brand-ink/10 z-40 md:hidden pointer-events-auto backdrop-blur-sm transition-opacity duration-500"
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />
       )}
 
       {/* Mobile Menu Dropdown */}
-      <div className={`md:hidden absolute top-full left-0 mt-2 w-full px-4 pointer-events-auto transition-all duration-300 ease-in-out z-50 ${isOpen ? 'max-h-[80vh] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4 overflow-hidden'}`}>
-        <div className="bg-white/95 backdrop-blur-xl shadow-2xl rounded-[2rem] border border-white/60 p-4 space-y-6 max-h-[70vh] overflow-y-auto ring-1 ring-black/5">
-          {/* Mobile Search REMOVED from here */}
-
-          <div className="space-y-2">
+      <div className={`md:hidden absolute top-full left-0 mt-4 w-full px-6 pointer-events-auto transition-all duration-500 ease-out z-50 ${isOpen ? 'max-h-[80vh] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4 overflow-hidden'}`}>
+        <div className="bg-brand-ivory/95 backdrop-blur-2xl shadow-2xl rounded-3xl border border-brand-ink/5 p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+          <div className="space-y-4">
             <Link
               to="/"
-              className="block px-3 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-[#1e3857] hover:bg-slate-50 transition-colors"
+              className="block px-4 py-3 rounded-xl text-lg font-medium text-brand-ink/80 hover:text-brand-ink hover:bg-brand-ink/5 transition-all display-font uppercase tracking-widest"
               onClick={() => setIsOpen(false)}
             >
               Inicio
@@ -244,21 +241,21 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.name}
                 to={link.path}
-                className="block px-3 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-[#1e3857] hover:bg-slate-50 transition-colors"
+                className="block px-4 py-3 rounded-xl text-lg font-medium text-brand-ink/80 hover:text-brand-ink hover:bg-brand-ink/5 transition-all display-font uppercase tracking-widest"
                 onClick={() => setIsOpen(false)}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="pt-6">
+            <div className="pt-8">
               <Button
-                className="w-full bg-[#1e3857] hover:bg-[#0f172a] text-white rounded-xl py-4 shadow-lg shadow-[#1e3857]/20"
+                className="w-full bg-brand-ink hover:bg-brand-ink/90 text-brand-ivory rounded-xl py-5 text-sm uppercase tracking-widest font-bold shadow-xl shadow-brand-ink/10"
                 onClick={() => {
                   setIsOpen(false);
                   setIsCartOpen(true);
                 }}
               >
-                <ShoppingBag className="w-5 h-5 mr-2" />
+                <ShoppingBag className="w-5 h-5 mr-3" />
                 Ver Carrito ({cartCount})
               </Button>
             </div>

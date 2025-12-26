@@ -159,63 +159,55 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
     const hasVariants = product.has_variants && product.variants && product.variants.length > 0;
 
     return (
-        <div className="min-h-screen pt-20 pb-10 md:pt-28 md:pb-16 bg-[#fdfdfd] relative overflow-hidden">
-            {/* Ambient Background Elements - Light Theme */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#44b6da]/5 rounded-full blur-[120px] animate-pulse"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#1e3857]/5 rounded-full blur-[120px] animation-delay-2000"></div>
+        <div className="min-h-screen bg-brand-ivory pt-32 pb-20 md:pt-48 md:pb-32 relative overflow-hidden">
+            {/* Minimal Background Geometry */}
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-0 right-0 w-px h-full bg-brand-ink/5" />
+                <div className="absolute bottom-1/4 left-0 w-full h-px bg-brand-ink/5" />
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
 
                 {/* Breadcrumb / Back */}
-                <div className="mb-4 md:mb-8">
-                    <Link to="/productos" className="inline-flex items-center text-slate-500 hover:text-[#44b6da] transition-colors font-bold text-xs md:text-sm uppercase tracking-wide">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Volver a Productos
-                    </Link>
-                </div>
 
-                <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-xl md:shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
 
-                        {/* Image Section with Gallery */}
-                        <div className="bg-white relative flex flex-col p-4 md:p-6 lg:p-8">
-                            {/* Main Image */}
-                            <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden group rounded-2xl bg-white flex items-center justify-center">
+                <div className="bg-transparent overflow-hidden">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24">
+
+                        {/* Image Section - Hero Scale */}
+                        <div className="lg:col-span-7 space-y-8 opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
+                            <div className="relative aspect-[4/5] bg-brand-ink/[0.02] overflow-hidden rounded-sm border border-brand-ink/5">
                                 <img
                                     src={displayImage}
                                     alt={product.name}
-                                    className="absolute inset-0 w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                                 />
                                 {product.featured && (
-                                    <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-yellow-400 text-yellow-950 text-[10px] md:text-xs font-bold px-2.5 py-1 md:px-3 md:py-1.5 rounded-full shadow-lg z-10">
-                                        ⭐ Destacado
+                                    <div className="absolute top-8 left-8 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.3em] font-bold px-4 py-2 z-10">
+                                        Exclusivo
                                     </div>
                                 )}
                             </div>
 
-                            {/* Thumbnail Gallery */}
+                            {/* Thumbnail Gallery - Refined */}
                             {(() => {
                                 const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
                                 if (allImages.length > 1) {
                                     return (
-                                        <div className="mt-4">
-                                            <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                                                {allImages.map((img, idx) => (
-                                                    <button
-                                                        key={idx}
-                                                        onClick={() => setDisplayImage(img)}
-                                                        className={`flex-shrink-0 w-14 h-14 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all ${displayImage === img ? 'border-[#44b6da] ring-2 ring-[#44b6da]/20' : 'border-slate-100 hover:border-slate-300'}`}
-                                                    >
-                                                        <img
-                                                            src={img}
-                                                            alt={`${product.name} ${idx + 1}`}
-                                                            className="w-full h-full object-contain bg-white"
-                                                        />
-                                                    </button>
-                                                ))}
-                                            </div>
+                                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                                            {allImages.map((img, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setDisplayImage(img)}
+                                                    className={`flex-shrink-0 w-24 h-24 rounded-sm overflow-hidden border transition-all ${displayImage === img ? 'border-brand-ink' : 'border-brand-ink/5 hover:border-brand-ink/20 opacity-60 hover:opacity-100'}`}
+                                                >
+                                                    <img
+                                                        src={img}
+                                                        alt={`${product.name} ${idx + 1}`}
+                                                        className="w-full h-full object-cover bg-brand-ivory"
+                                                    />
+                                                </button>
+                                            ))}
                                         </div>
                                     );
                                 }
@@ -223,72 +215,61 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                             })()}
                         </div>
 
-                        {/* Info Section */}
-                        <div className="p-4 md:p-8 lg:p-12 flex flex-col h-full bg-white relative">
-                            {/* Decorative line */}
-                            <div className="absolute top-10 left-0 w-1 h-32 bg-gradient-to-b from-[#44b6da] to-transparent rounded-r-full lg:block hidden"></div>
+                        {/* Info Section - Editorial Detail */}
+                        <div className="lg:col-span-5 flex flex-col h-full opacity-0 animate-reveal" style={{ animationDelay: '0.3s' }}>
+                            <div className="mb-auto space-y-8">
+                                <div className="space-y-4">
 
-                            <div className="mb-auto">
-                                {categoryName ? (
-                                    <Link
-                                        to={`/productos?category=${product.category_id}`}
-                                        className="text-[10px] md:text-xs font-bold text-[#44b6da] tracking-widest uppercase mb-1.5 md:mb-3 block hover:text-[#1e3857] transition-colors"
-                                    >
-                                        {categoryName}
-                                    </Link>
-                                ) : (
-                                    <span className="text-[10px] md:text-xs font-bold text-[#44b6da] tracking-widest uppercase mb-1.5 md:mb-3 block">
-                                        Detalle del Producto
-                                    </span>
-                                )}
-                                <h1 className="text-xl md:text-3xl lg:text-5xl font-black text-[#1e3857] mb-2 md:mb-4 tight-leading tracking-tight leading-tight">
-                                    {product.name}
-                                </h1>
-                                {product.sku && (
-                                    <p className="text-[10px] md:text-xs text-slate-400 font-mono mb-4 md:mb-6 bg-slate-50 inline-block px-2 py-1 rounded">
-                                        SKU: <span className="text-slate-600 select-all font-semibold">{product.sku}</span>
-                                    </p>
-                                )}
 
-                                <div className="flex flex-col mb-5 md:mb-8 p-3 md:p-6 bg-slate-50/50 rounded-xl md:rounded-2xl border border-slate-100">
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-2xl md:text-4xl font-black text-[#1e3857] tracking-tight">
+                                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-brand-ink tracking-tight display-font leading-none">
+                                        {product.name}
+                                    </h1>
+
+                                    {product.sku && (
+                                        <p className="text-[10px] uppercase tracking-widest text-brand-ink/30 font-bold">
+                                            Ref. <span className="text-brand-ink/60 select-all">{product.sku}</span>
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="border-y border-brand-ink/5 py-8 space-y-4">
+                                    <div className="flex items-baseline justify-between">
+                                        <span className="text-4xl font-medium text-brand-ink display-font tabular-nums">
                                             ${displayPrice.toFixed(2)}
                                         </span>
-                                    </div>
-                                    {product.min_quantity && product.min_quantity > 1 && (
-                                        <span className="text-[10px] md:text-xs font-bold text-[#44b6da] mt-1 uppercase tracking-wide">
-                                            Mínimo: {product.min_quantity} {product.min_quantity_unit || 'unidades'}
-                                        </span>
-                                    )}
-                                    <div className="mt-3 md:mt-4 flex items-center gap-2">
                                         {displayStock > 0 ? (
-                                            <span className="text-xs md:text-sm font-bold text-green-700 bg-green-100/50 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full flex items-center gap-1.5 border border-green-200">
-                                                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                                Disponible
+                                            <span className="text-[10px] uppercase tracking-widest font-bold text-brand-accent px-3 py-1 bg-brand-accent/5 rounded-full border border-brand-accent/10">
+                                                En Stock
                                             </span>
                                         ) : (
-                                            <span className="text-xs md:text-sm font-bold text-red-700 bg-red-100/50 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full flex items-center gap-1.5 border border-red-200">
-                                                <AlertCircle className="w-3 h-3" />
-                                                Agotado
+                                            <span className="text-[10px] uppercase tracking-widest font-bold text-red-500/60 px-3 py-1 bg-red-500/5 rounded-full border border-red-500/10">
+                                                No Disponible
                                             </span>
                                         )}
                                     </div>
+                                    {product.min_quantity && product.min_quantity > 1 && (
+                                        <p className="text-[11px] text-brand-ink/40 tracking-widest font-bold uppercase">
+                                            Pedido Mínimo: {product.min_quantity} {product.min_quantity_unit || 'unidades'}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {product.description && (
-                                    <p className="text-slate-600 leading-normal md:leading-relaxed mb-5 md:mb-8 text-sm md:text-lg font-light">
-                                        {product.description}
-                                    </p>
+                                    <div className="space-y-4">
+                                        <h4 className="text-[11px] uppercase tracking-widest font-bold text-brand-ink/40">Descripción</h4>
+                                        <p className="text-brand-ink/60 text-lg font-light leading-relaxed">
+                                            {product.description}
+                                        </p>
+                                    </div>
                                 )}
 
-                                {/* Variants Selection */}
+                                {/* Variants Selection - Minimal Grid */}
                                 {hasVariants && (
-                                    <div className="mb-5 md:mb-8 animate-fade-in-up">
-                                        <h3 className="text-xs md:text-sm font-bold text-[#1e3857] mb-2 md:mb-4 uppercase tracking-wide flex items-center gap-2">
+                                    <div className="space-y-6">
+                                        <h3 className="text-[11px] uppercase tracking-widest font-bold text-brand-ink/40">
                                             {product.variant_type || 'Opciones'}
                                         </h3>
-                                        <div className="flex flex-wrap gap-2 md:gap-3">
+                                        <div className="flex flex-wrap gap-3">
                                             {product.variants?.filter(v => v.active).map((variant) => {
                                                 const effectiveStock = (variant.stock !== undefined && variant.stock !== null)
                                                     ? variant.stock
@@ -301,23 +282,16 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                                         onClick={() => !isOutOfStock && handleVariantSelect(variant)}
                                                         disabled={isOutOfStock}
                                                         className={`
-                                                        relative px-3 py-1.5 md:px-5 md:py-3 rounded-lg md:rounded-xl border-2 text-[10px] md:text-sm font-bold transition-all duration-200 flex flex-col items-center min-w-[70px] md:min-w-[90px]
+                                                        px-6 py-3 border text-[10px] uppercase tracking-widest font-bold font-sans transition-all duration-300
                                                         ${isOutOfStock
-                                                                ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed'
+                                                                ? 'opacity-20 cursor-not-allowed grayscale'
                                                                 : selectedVariant?.id === variant.id
-                                                                    ? 'border-[#1e3857] bg-[#1e3857] text-white shadow-lg shadow-[#1e3857]/20 transform scale-105'
-                                                                    : 'border-slate-100 text-slate-500 bg-white hover:border-[#44b6da] hover:text-[#44b6da]'
+                                                                    ? 'border-brand-ink bg-brand-ink text-brand-ivory'
+                                                                    : 'border-brand-ink/10 text-brand-ink/60 hover:border-brand-ink/30'
                                                             }
                                                     `}
                                                     >
-                                                        <span>{variant.name}</span>
-                                                        {isOutOfStock ? (
-                                                            <span className="text-[9px] md:text-[10px] text-red-400 font-bold mt-0.5">Agotado</span>
-                                                        ) : (
-                                                            variant.price > 0 && variant.price !== product.price && (
-                                                                <span className={`text-[9px] md:text-[10px] font-mono mt-0.5 ${selectedVariant?.id === variant.id ? 'text-white/80' : 'text-slate-400'}`}>${variant.price.toFixed(2)}</span>
-                                                            )
-                                                        )}
+                                                        {variant.name}
                                                     </button>
                                                 );
                                             })}
@@ -325,22 +299,22 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                     </div>
                                 )}
 
-                                {/* Color Selection */}
+                                {/* Color Selection - Simplified Dots */}
                                 {product.colors && product.colors.length > 0 && (
-                                    <div className="mb-5 md:mb-8 animate-fade-in-up [animation-delay:0.1s]">
-                                        <h3 className="text-xs md:text-sm font-bold text-[#1e3857] mb-2 md:mb-4 uppercase tracking-wide">
-                                            Color: <span className="text-[#44b6da] font-bold ml-1">{activeColor}</span>
+                                    <div className="space-y-6">
+                                        <h3 className="text-[11px] uppercase tracking-widest font-bold text-brand-ink/40">
+                                            Atributo de Color: <span className="text-brand-ink font-bold ml-1">{activeColor}</span>
                                         </h3>
-                                        <div className="flex flex-wrap gap-2 md:gap-3">
+                                        <div className="flex flex-wrap gap-4">
                                             {product.colors.map((color) => (
                                                 <button
                                                     key={color}
                                                     onClick={() => setActiveColor(color)}
                                                     className={`
-                                                        px-3 py-1.5 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-bold border-2 transition-all duration-200
+                                                        px-4 py-2 text-[10px] uppercase tracking-widest font-bold border transition-all duration-300
                                                         ${activeColor === color
-                                                            ? 'border-[#44b6da] bg-[#44b6da]/10 text-[#1e3857] shadow-sm'
-                                                            : 'border-slate-100 text-slate-500 bg-white hover:border-slate-300'
+                                                            ? 'border-brand-ink bg-brand-ink/5 text-brand-ink'
+                                                            : 'border-brand-ink/5 text-brand-ink/40 hover:border-brand-ink/20'
                                                         }
                                                     `}
                                                     title={color}
@@ -352,32 +326,27 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                     </div>
                                 )}
 
-                                {/* Quantity Selector */}
-                                <div className="mb-5 md:mb-8">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-3 md:gap-4">
-                                        <div className="flex items-center gap-0 border-2 border-slate-100 rounded-lg md:rounded-xl bg-white overflow-hidden p-1 shadow-sm w-fit">
+                                {/* Quantity Selector - Minimal */}
+                                <div className="space-y-6">
+                                    <h3 className="text-[11px] uppercase tracking-widest font-bold text-brand-ink/40">Cantidad</h3>
+                                    <div className="flex items-center space-x-12">
+                                        <div className="flex items-center space-x-8 border-b border-brand-ink/10 pb-2 min-w-[120px]">
                                             <button
                                                 onClick={() => setQuantity(Math.max(product.min_quantity || 1, (typeof quantity === 'number' ? quantity : 1) - 1))}
                                                 disabled={(typeof quantity === 'number' ? quantity : 1) <= (product.min_quantity || 1)}
-                                                className="w-9 h-9 md:w-12 md:h-10 rounded-md md:rounded-lg bg-transparent text-slate-400 hover:bg-slate-50 hover:text-[#1e3857] font-bold transition-all flex items-center justify-center disabled:opacity-30 disabled:hover:bg-transparent text-lg"
+                                                className="text-brand-ink/30 hover:text-brand-ink font-light text-2xl transition-colors disabled:opacity-10"
                                             >
-                                                -
+                                                &minus;
                                             </button>
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
-                                                pattern="[0-9]*"
                                                 value={quantity}
                                                 onChange={(e) => {
                                                     const val = e.target.value;
-                                                    if (val === '') {
-                                                        setQuantity('' as any);
-                                                        return;
-                                                    }
+                                                    if (val === '') { setQuantity('' as any); return; }
                                                     const num = parseInt(val);
-                                                    if (!isNaN(num) && num >= 0) {
-                                                        setQuantity(num);
-                                                    }
+                                                    if (!isNaN(num) && num >= 0) { setQuantity(num); }
                                                 }}
                                                 onBlur={() => {
                                                     let val = typeof quantity === 'number' ? quantity : parseInt(quantity as any) || 0;
@@ -387,17 +356,17 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                                     if (val > 9999) val = 9999;
                                                     setQuantity(val);
                                                 }}
-                                                className="w-12 md:w-16 text-center text-base md:text-lg font-mono font-bold text-[#1e3857] bg-transparent outline-none border-x border-slate-100 h-6"
+                                                className="w-full text-center text-xl font-medium text-brand-ink bg-transparent outline-none display-font tabular-nums"
                                             />
                                             <button
                                                 onClick={() => setQuantity(Math.min(displayStock, (typeof quantity === 'number' ? quantity : 1) + 1))}
                                                 disabled={(typeof quantity === 'number' ? quantity : 1) >= displayStock}
-                                                className="w-9 h-9 md:w-12 md:h-10 rounded-md md:rounded-lg bg-transparent text-slate-400 hover:bg-slate-50 hover:text-[#1e3857] font-bold transition-all flex items-center justify-center disabled:opacity-30 disabled:hover:bg-transparent text-lg"
+                                                className="text-brand-ink/30 hover:text-brand-ink font-light text-2xl transition-colors disabled:opacity-10"
                                             >
-                                                +
+                                                &#43;
                                             </button>
                                         </div>
-                                        <span className="text-xs md:text-sm font-medium text-slate-400">
+                                        <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-brand-ink/30">
                                             {product.min_quantity_unit || 'unidades'}
                                         </span>
                                     </div>
@@ -405,35 +374,21 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                             </div>
 
                             {/* Action Area */}
-                            <div className="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-slate-100 flex flex-col gap-3 md:gap-4">
-                                <Button
-                                    size="lg"
-                                    className={`w-full text-sm md:text-lg py-3.5 md:py-5 h-auto shadow-xl shadow-[#1e3857]/20 transition-all duration-300 font-bold rounded-xl md:rounded-2xl ${isAdding ? 'bg-green-600 hover:bg-green-700 cursor-default scale-95' : 'bg-[#1e3857] hover:bg-[#0f172a] hover:shadow-[#1e3857]/40 hover:-translate-y-1'}`}
+                            <div className="mt-16 pt-12 border-t border-brand-ink/5 flex flex-col gap-6">
+                                <button
+                                    className={`w-full py-6 text-[10px] uppercase tracking-[0.5em] font-bold transition-all duration-500 shadow-2xl ${isAdding ? 'bg-brand-accent text-brand-ivory' : 'bg-brand-ink text-brand-ivory hover:translate-y-[-2px] shadow-brand-ink/20'}`}
                                     onClick={handleAddToCart}
                                     disabled={isAdding || displayStock === 0}
                                 >
-                                    {isAdding ? (
-                                        <>
-                                            <Check className="w-5 h-5 md:w-6 md:h-6 mr-2" />
-                                            <span>¡Agregado al Carrito!</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ShoppingBag className="w-5 h-5 md:w-6 md:h-6 mr-2" />
-                                            <span>{displayStock === 0 ? 'Producto Agotado' : 'Agregar al Carrito'}</span>
-                                        </>
-                                    )}
-                                </Button>
+                                    {isAdding ? 'Agregado Correctamente' : displayStock === 0 ? 'Agotado Temporalmente' : 'Agregar a la Cotización'}
+                                </button>
 
                                 {product.is_customizable && (
-                                    <div className="flex flex-col items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm text-[#1e3857] bg-[#f0f9ff] py-3 md:py-4 rounded-xl md:rounded-2xl border border-[#e0f2fe]">
-                                        <div className="flex items-center gap-2 font-bold">
-                                            <AlertCircle className="w-4 h-4 text-[#44b6da]" />
-                                            <span>Producto Personalizable</span>
-                                        </div>
+                                    <div className="flex flex-col items-center justify-center p-6 bg-brand-ink/[0.02] border border-brand-ink/5 rounded-sm space-y-2">
+                                        <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-ink/60">Servicio de Personalización</span>
                                         {product.customization_price && product.customization_price > 0 && (
-                                            <span className="text-[10px] md:text-xs text-slate-500">
-                                                Costo adicional desde: <span className="font-bold text-[#1e3857]">${product.customization_price.toFixed(2)}</span> / unidad
+                                            <span className="text-[10px] font-bold text-brand-accent">
+                                                &plus; ${product.customization_price.toFixed(2)} / unidad
                                             </span>
                                         )}
                                     </div>
@@ -442,60 +397,58 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                         </div>
                     </div>
 
-                    {/* Features Footer */}
-                    <div className="bg-[#f8fafc] border-t border-slate-100 p-6 md:p-8 lg:p-10">
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                    {/* Features Footer - Minimal Bar */}
+                    <div className="mt-32 pt-16 border-t border-brand-ink/5">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
                             {[
-                                { icon: Truck, title: "Envíos", desc: "A todo el país" },
-                                { icon: ShieldCheck, title: "Garantía", desc: "Calidad 100%" },
-                                { icon: Phone, title: "Soporte", desc: "Expertos listos" },
-                                { icon: Check, title: "Mayorista", desc: "Precios especiales" },
+                                { icon: Truck, title: "Logística Global", desc: "Envíos directos a todo el país" },
+                                { icon: ShieldCheck, title: "Calidad Certificada", desc: "Garantía total en insumos premium" },
+                                { icon: Phone, title: "Asesoría Técnica", desc: "Soporte experto especializado" },
+                                { icon: Check, title: "Aliado Mayorista", desc: "Escalabilidad para grandes marcas" },
                             ].map((feature, idx) => (
-                                <div key={idx} className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left gap-3">
-                                    <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 text-[#44b6da] shrink-0">
-                                        <feature.icon className="w-5 h-5 md:w-6 md:h-6" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-[#1e3857] text-xs md:text-sm">{feature.title}</h4>
-                                        <p className="text-[10px] md:text-xs text-slate-500 mt-1">{feature.desc}</p>
-                                    </div>
+                                <div key={idx} className="space-y-3">
+                                    <feature.icon className="w-5 h-5 text-brand-ink/20 stroke-[1.5px]" />
+                                    <h4 className="text-[11px] uppercase tracking-widest font-bold text-brand-ink">{feature.title}</h4>
+                                    <p className="text-xs text-brand-ink/40 font-light leading-relaxed">{feature.desc}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div >
 
-                {/* Related Products Section */}
+                {/* Related Products - Asymmetric Grid */}
                 {
                     relatedProducts.length > 0 && (
-                        <div className="mt-10 md:mt-24 mb-8 md:mb-12 animate-fade-in-up">
-                            <h2 className="text-lg md:text-2xl font-black text-[#1e3857] mb-4 md:mb-8 flex items-center gap-2 md:gap-3">
-                                <span className="bg-[#e0f2fe] text-[#1e3857] p-2 md:p-2.5 rounded-lg md:rounded-xl"><ShoppingBag size={16} className="md:w-6 md:h-6" /></span>
-                                Productos Relacionados
-                            </h2>
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-                                {relatedProducts.map((related) => (
+                        <div className="mt-48 opacity-0 animate-reveal" style={{ animationDelay: '0.5s' }}>
+                            <div className="flex items-center space-x-6 mb-16">
+                                <h2 className="text-3xl md:text-5xl font-medium text-brand-ink display-font">Más opciones</h2>
+                                <div className="h-px flex-1 bg-brand-ink/5"></div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+                                {relatedProducts.map((related, index) => (
                                     <div
                                         key={related.id}
                                         onClick={() => {
                                             navigate(`/producto/${related.id}`);
                                             window.scrollTo(0, 0);
                                         }}
-                                        className="group bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col hover:-translate-y-2 cursor-pointer"
+                                        className="group cursor-pointer flex flex-col space-y-6"
+                                        style={{ marginTop: index % 2 === 0 ? '0' : '2rem' }}
                                     >
-                                        <div className="aspect-[4/3] relative overflow-hidden bg-white">
+                                        <div className="aspect-[4/5] relative overflow-hidden bg-brand-ink/[0.02] rounded-sm">
+                                            <div className="absolute inset-0 border border-brand-ink/5 z-10 pointer-events-none group-hover:inset-4 transition-all duration-700" />
                                             <img
                                                 src={related.image_url}
                                                 alt={related.name}
-                                                className="absolute inset-0 w-full h-full object-contain p-6 transition-transform duration-500 group-hover:scale-110"
+                                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                                             />
                                         </div>
-                                        <div className="p-6 flex flex-col flex-1">
-                                            <h3 className="font-bold text-[#1e3857] mb-2 group-hover:text-[#44b6da] transition-colors line-clamp-1">{related.name}</h3>
-                                            <p className="text-slate-400 text-sm mb-4 line-clamp-2 flex-1 font-light leading-relaxed">{related.description}</p>
-                                            <div className="mt-auto flex items-center justify-between font-bold">
-                                                <span className="text-[#1e3857] text-lg">${related.price.toFixed(2)}</span>
-                                                <span className="text-xs text-[#44b6da] bg-[#e0f2fe] px-3 py-1.5 rounded-full group-hover:bg-[#44b6da] group-hover:text-white transition-colors">Ver Detalles</span>
+                                        <div className="space-y-2">
+                                            <h3 className="text-lg font-medium text-brand-ink display-font group-hover:text-brand-accent transition-colors">{related.name}</h3>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-bold text-brand-ink/40 tabular-nums">${related.price.toFixed(2)}</span>
+                                                <span className="text-[10px] uppercase tracking-widest font-bold text-brand-ink/30 border-b border-transparent group-hover:border-brand-ink/20 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 opacity-0 group-hover:opacity-100">Ver Catálogo</span>
                                             </div>
                                         </div>
                                     </div>

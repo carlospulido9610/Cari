@@ -123,100 +123,98 @@ export const CartDrawer: React.FC = () => {
 
     return (
         <div className="fixed inset-0 z-[100] overflow-hidden">
-            {/* Overlay */}
+            {/* Overlay - Deep contrast blur */}
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 bg-brand-ink/40 backdrop-blur-md transition-opacity duration-700"
                 onClick={() => setIsCartOpen(false)}
             />
 
-            {/* Sidebar */}
-            <div className="absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out animate-slide-in-right">
-                {/* Header Compact */}
-                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-white relative z-10">
-                    <div className="flex items-center gap-2">
-                        <ShoppingBag className="w-4 h-4 text-[#44b6da]" />
-                        <h2 className="text-base font-bold text-[#1e3857]">Tu Carrito</h2>
-                        <span className="bg-[#1e3857] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md shadow-[#1e3857]/20">
-                            {items.length}
-                        </span>
+            {/* Sidebar - Premium Editorial Panel */}
+            <div className="absolute top-0 right-0 h-full w-full max-w-md bg-brand-ivory shadow-[0_0_80px_rgba(0,0,0,0.1)] flex flex-col transform transition-transform duration-700 ease-in-out animate-slide-in-right">
+
+                {/* Header - Minimal Luxury */}
+                <div className="px-8 py-8 border-b border-brand-ink/5 flex items-center justify-between bg-brand-ivory relative z-10">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-bold text-brand-accent tabular-nums">
+                                [{items.length}]
+                            </span>
+                        </div>
                     </div>
                     <button
                         onClick={() => setIsCartOpen(false)}
-                        className="p-1.5 hover:bg-slate-50 rounded-full text-slate-400 hover:text-[#1e3857] transition-all"
+                        className="w-10 h-10 flex items-center justify-center rounded-full border border-brand-ink/10 hover:border-brand-ink transition-colors"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-4 h-4 text-brand-ink" />
                     </button>
                 </div>
 
-                {/* Items List Compact */}
-                <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-slate-50/50">
+                {/* Items List - High-End Layout */}
+                <div className="flex-1 overflow-y-auto px-8 py-6 space-y-8">
                     {items.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-xl shadow-slate-200/50 border border-slate-100">
-                                <ShoppingBag className="w-6 h-6 text-[#44b6da]" />
-                            </div>
-                            <h3 className="text-[#1e3857] font-bold text-base mb-1">Carrito vacío</h3>
-                            <p className="text-slate-500 text-xs mb-6 max-w-[180px]">Explora nuestro catálogo.</p>
-                            <Button variant="outline" size="sm" onClick={() => setIsCartOpen(false)} className="border-[#44b6da] text-[#1e3857] hover:bg-[#44b6da]/5 text-xs">
-                                Ver Productos
-                            </Button>
+                        <div className="h-full flex flex-col items-center justify-center text-center">
+                            <h3 className="text-brand-ink/20 font-medium text-xl display-font mb-4">La colección está vacía</h3>
+                            <button
+                                onClick={() => setIsCartOpen(false)}
+                                className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-accent hover:text-brand-ink transition-colors border-b border-brand-accent pb-1"
+                            >
+                                Explorar Catálogo
+                            </button>
                         </div>
                     ) : (
                         items.map((item, index) => (
-                            <div key={`${item.productId}-${index}`} className="relative flex gap-3 p-3 bg-white rounded-xl border border-slate-100 shadow-sm">
-                                {/* Delete Button Absolute */}
+                            <div key={`${item.productId}-${index}`} className="group relative flex gap-6 pb-8 border-b border-brand-ink/5 last:border-0">
+                                {/* Delete Button */}
                                 <button
                                     onClick={() => removeFromCart(item.productId, item.selectedVariant?.name, item.selectedColor)}
-                                    className="absolute top-2 right-2 text-slate-300 hover:text-red-500 transition-colors p-1"
+                                    className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 text-brand-ink/20 hover:text-red-500 transition-all duration-300"
                                 >
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <X className="w-3.5 h-3.5" />
                                 </button>
 
-                                {/* Image */}
-                                <div className="w-14 h-14 bg-slate-50 rounded-lg border border-slate-100 overflow-hidden flex-shrink-0">
+                                {/* Image - Editorial Frame */}
+                                <div className="w-24 h-24 bg-white border border-brand-ink/5 overflow-hidden flex-shrink-0 relative group-hover:border-brand-accent/30 transition-colors duration-500">
                                     {item.image ? (
-                                        <img src={item.image} alt={item.productName} className="w-full h-full object-cover" />
+                                        <img src={item.image} alt={item.productName} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                            <ShoppingBag className="w-4 h-4" />
+                                        <div className="w-full h-full flex items-center justify-center text-brand-ink/5">
+                                            <ShoppingBag className="w-6 h-6" />
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Details */}
-                                <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                    <div className="pr-6 mb-1">
-                                        <h4 className="font-bold text-[#1e3857] text-xs leading-tight truncate">{item.productName}</h4>
-                                        <div className="flex flex-wrap gap-1 mt-0.5">
-                                            {item.selectedVariant && (
-                                                <span className="text-[9px] uppercase font-bold text-[#44b6da] bg-[#44b6da]/5 px-1.5 py-px rounded">
-                                                    {item.selectedVariant.name}
-                                                </span>
-                                            )}
-                                            {item.selectedColor && (
-                                                <span className="text-[9px] uppercase font-bold text-slate-500 bg-slate-100 px-1.5 py-px rounded flex items-center gap-1.5">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                                                    {item.selectedColor}
-                                                </span>
-                                            )}
-                                        </div>
+                                <div className="flex-1 min-w-0 flex flex-col pt-1">
+                                    <h4 className="font-medium text-brand-ink text-sm tracking-tight display-font mb-2">{item.productName}</h4>
+
+                                    <div className="flex flex-wrap gap-3 mb-4">
+                                        {item.selectedVariant && (
+                                            <span className="text-[9px] uppercase tracking-widest font-bold text-brand-ink/40">
+                                                Var: {item.selectedVariant.name}
+                                            </span>
+                                        )}
+                                        {item.selectedColor && (
+                                            <span className="text-[9px] uppercase tracking-widest font-bold text-brand-ink/40 flex items-center gap-2">
+                                                Col: {item.selectedColor}
+                                            </span>
+                                        )}
                                     </div>
 
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-black text-[#1e3857]">
+                                    <div className="mt-auto flex items-center justify-between">
+                                        <span className="text-sm font-bold text-brand-ink tabular-nums">
                                             ${(item.price * item.quantity).toFixed(2)}
                                         </span>
 
-                                        <div className="flex items-center bg-slate-50 rounded border border-slate-200 h-6 shadow-sm">
+                                        <div className="flex items-center border border-brand-ink/10 h-8 rounded-sm overflow-hidden">
                                             <button
-                                                className="w-6 h-full flex items-center justify-center text-slate-400 hover:text-[#1e3857] hover:bg-white rounded-l transition-colors"
+                                                className="w-8 h-full flex items-center justify-center text-brand-ink/30 hover:text-brand-ink hover:bg-brand-ink/5 transition-colors"
                                                 onClick={() => updateQuantity(item.productId, item.quantity - 1, item.selectedVariant?.name, item.selectedColor)}
                                             >
                                                 -
                                             </button>
-                                            <span className="text-[10px] font-bold text-[#1e3857] w-6 text-center">{item.quantity}</span>
+                                            <span className="text-[10px] font-bold text-brand-ink w-8 text-center tabular-nums">{item.quantity}</span>
                                             <button
-                                                className="w-6 h-full flex items-center justify-center text-slate-400 hover:text-[#1e3857] hover:bg-white rounded-r transition-colors"
+                                                className="w-8 h-full flex items-center justify-center text-brand-ink/30 hover:text-brand-ink hover:bg-brand-ink/5 transition-colors"
                                                 onClick={() => updateQuantity(item.productId, item.quantity + 1, item.selectedVariant?.name, item.selectedColor)}
                                             >
                                                 +
@@ -229,171 +227,126 @@ export const CartDrawer: React.FC = () => {
                     )}
                 </div>
 
-                {/* Footer */}
+                {/* Checkout Summary - Clean Form */}
                 {items.length > 0 && (
-                    <div className="p-4 border-t border-slate-100 bg-white shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] z-20 max-h-[60vh] overflow-y-auto">
-                        <div className="flex justify-between items-end mb-4">
-                            <span className="text-slate-500 text-xs font-medium">Total Estimado</span>
-                            <span className="text-xl font-black text-[#1e3857] leading-none">${cartTotal.toFixed(2)}</span>
+                    <div className="p-8 bg-white border-t border-brand-ink/5 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-20 overflow-y-auto max-h-[60vh]">
+                        <div className="flex justify-between items-baseline mb-10">
+                            <span className="text-[10px] font-bold text-brand-ink/40">Total</span>
+                            <span className="text-4xl font-light text-brand-ink tracking-tighter tabular-nums">${cartTotal.toFixed(2)}</span>
                         </div>
 
-                        {/* Customer Basic Info - Compact Row */}
-                        <div className="mb-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                            <h4 className="text-xs font-bold text-[#1e3857] mb-2 flex items-center gap-2">
-                                <span className="w-1 h-3 bg-[#44b6da] rounded-full"></span>
-                                Datos de Contacto
-                            </h4>
-                            <div className="flex gap-2">
-                                <div className="flex-1">
+                        {/* Order Form */}
+                        <div className="space-y-10">
+                            {/* Personal Info */}
+                            <div className="space-y-6">
+                                <h4 className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-ink border-b border-brand-ink/10 pb-2">Información de Enlace</h4>
+                                <div className="space-y-4">
                                     <input
                                         type="text"
-                                        required
-                                        className="w-full bg-white border border-slate-200 rounded-md p-2 text-xs outline-none focus:border-[#44b6da] text-[#1e3857]"
-                                        placeholder="Nombre"
+                                        className="w-full bg-transparent border-b border-brand-ink/10 py-3 text-sm focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/20"
+                                        placeholder="Nombre del Solicitante"
                                         value={customerName}
                                         onChange={(e) => setCustomerName(e.target.value)}
                                     />
-                                </div>
-                                <div className="flex-1">
                                     <input
                                         type="tel"
-                                        required
-                                        className="w-full bg-white border border-slate-200 rounded-md p-2 text-xs outline-none focus:border-[#44b6da] text-[#1e3857]"
-                                        placeholder="Teléfono"
+                                        className="w-full bg-transparent border-b border-brand-ink/10 py-3 text-sm focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/20 tabular-nums"
+                                        placeholder="Teléfono Corporativo"
                                         value={customerPhone}
                                         onChange={(e) => setCustomerPhone(e.target.value)}
                                     />
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Delivery Method Selector - Compact */}
-                        <div className="mb-3">
-                            <div className="grid grid-cols-2 gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setDeliveryMethod('pickup')}
-                                    className={`p-2 rounded-lg border flex items-center justify-center gap-2 transition-all ${deliveryMethod === 'pickup'
-                                        ? 'border-[#44b6da] bg-[#44b6da]/10 text-[#1e3857]'
-                                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
-                                        }`}
-                                >
-                                    <Store className="w-4 h-4" />
-                                    <span className="text-xs font-bold">Retiro</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setDeliveryMethod('shipping')}
-                                    className={`p-2 rounded-lg border flex items-center justify-center gap-2 transition-all ${deliveryMethod === 'shipping'
-                                        ? 'border-[#44b6da] bg-[#44b6da]/10 text-[#1e3857]'
-                                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
-                                        }`}
-                                >
-                                    <Truck className="w-4 h-4" />
-                                    <span className="text-xs font-bold">Envío</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Shipping Form */}
-                        {deliveryMethod === 'shipping' && (
-                            <div className="mb-4 bg-orange-50/50 p-3 rounded-lg border border-orange-100 animate-fade-in">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h4 className="text-xs font-bold text-orange-800">Datos de Envío</h4>
-
-                                    {/* Redundancy Fix */}
-                                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                className="peer sr-only"
-                                                checked={sameAsCustomer}
-                                                onChange={(e) => setSameAsCustomer(e.target.checked)}
-                                            />
-                                            {sameAsCustomer ? (
-                                                <CheckSquare className="w-3.5 h-3.5 text-[#44b6da]" />
-                                            ) : (
-                                                <Square className="w-3.5 h-3.5 text-slate-400" />
-                                            )}
-                                        </div>
-                                        <span className="text-[10px] text-slate-500 font-medium">Mismos datos</span>
-                                    </label>
+                            {/* Delivery Options */}
+                            <div className="space-y-4">
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => setDeliveryMethod('pickup')}
+                                        className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all ${deliveryMethod === 'pickup' ? 'border-brand-ink bg-brand-ink text-brand-ivory' : 'border-brand-ink/10 text-brand-ink/40'}`}
+                                    >
+                                        Retiro en Sede
+                                    </button>
+                                    <button
+                                        onClick={() => setDeliveryMethod('shipping')}
+                                        className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all ${deliveryMethod === 'shipping' ? 'border-brand-ink bg-brand-ink text-brand-ivory' : 'border-brand-ink/10 text-brand-ink/40'}`}
+                                    >
+                                        Envío Nacional
+                                    </button>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div>
+                                {deliveryMethod === 'shipping' && (
+                                    <div className="pt-6 space-y-4 animate-reveal">
+                                        <div className="flex items-center justify-between">
+                                            <h5 className="text-[9px] uppercase tracking-widest font-bold text-brand-accent">Logística de Envío</h5>
+                                            <label className="flex items-center gap-2 cursor-pointer group">
+                                                <input
+                                                    type="checkbox"
+                                                    className="peer sr-only"
+                                                    checked={sameAsCustomer}
+                                                    onChange={(e) => setSameAsCustomer(e.target.checked)}
+                                                />
+                                                <div className={`w-3.5 h-3.5 border border-brand-ink/20 flex items-center justify-center transition-colors ${sameAsCustomer ? 'bg-brand-ink border-brand-ink' : ''}`}>
+                                                    {sameAsCustomer && <X className="w-2.5 h-2.5 text-brand-ivory" />}
+                                                </div>
+                                                <span className="text-[9px] uppercase tracking-widest font-bold text-brand-ink/30">Mismos datos</span>
+                                            </label>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
                                             <select
-                                                className="w-full bg-white border border-slate-200 rounded-md p-1.5 text-xs outline-none focus:border-orange-400 text-[#1e3857]"
+                                                className="bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none"
                                                 value={shippingAgency}
                                                 onChange={(e) => setShippingAgency(e.target.value as ShippingAgency)}
                                             >
                                                 <option value="MRW">MRW</option>
                                                 <option value="ZOOM">ZOOM</option>
                                             </select>
-                                        </div>
-                                        <div>
                                             <input
                                                 type="text"
-                                                className="w-full bg-white border border-slate-200 rounded-md p-1.5 text-xs outline-none focus:border-orange-400 text-[#1e3857]"
+                                                className="bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none placeholder:text-brand-ink/20"
                                                 placeholder="Ciudad"
                                                 value={shippingCity}
                                                 onChange={(e) => setShippingCity(e.target.value)}
                                             />
                                         </div>
-                                    </div>
-                                    <input
-                                        type="text"
-                                        className="w-full bg-white border border-slate-200 rounded-md p-1.5 text-xs outline-none focus:border-orange-400 text-[#1e3857]"
-                                        placeholder="Dirección Agencia"
-                                        value={shippingAddress}
-                                        onChange={(e) => setShippingAddress(e.target.value)}
-                                    />
-
-                                    <div className="grid grid-cols-2 gap-2">
                                         <input
                                             type="text"
-                                            className="w-full bg-white border border-slate-200 rounded-md p-1.5 text-xs outline-none focus:border-orange-400 text-[#1e3857] disabled:bg-slate-100 disabled:text-slate-400"
-                                            placeholder="Destinatario"
-                                            value={shippingName}
-                                            onChange={(e) => setShippingName(e.target.value)}
-                                            disabled={sameAsCustomer}
+                                            className="w-full bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none placeholder:text-brand-ink/20"
+                                            placeholder="Dirección Detallada de Agencia"
+                                            value={shippingAddress}
+                                            onChange={(e) => setShippingAddress(e.target.value)}
                                         />
-                                        <input
-                                            type="tel"
-                                            className="w-full bg-white border border-slate-200 rounded-md p-1.5 text-xs outline-none focus:border-orange-400 text-[#1e3857] disabled:bg-slate-100 disabled:text-slate-400"
-                                            placeholder="Teléfono Envío"
-                                            value={shippingPhone}
-                                            onChange={(e) => setShippingPhone(e.target.value)}
-                                            disabled={sameAsCustomer}
-                                        />
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <input
+                                                type="text"
+                                                className="bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none disabled:opacity-30"
+                                                placeholder="Destinatario"
+                                                value={shippingName}
+                                                onChange={(e) => setShippingName(e.target.value)}
+                                                disabled={sameAsCustomer}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none"
+                                                placeholder="ID / Cédula"
+                                                value={shippingCedula}
+                                                onChange={(e) => setShippingCedula(e.target.value)}
+                                            />
+                                        </div>
                                     </div>
-                                    <input
-                                        type="text"
-                                        className="w-full bg-white border border-slate-200 rounded-md p-1.5 text-xs outline-none focus:border-orange-400 text-[#1e3857]"
-                                        placeholder="Cédula"
-                                        value={shippingCedula}
-                                        onChange={(e) => setShippingCedula(e.target.value)}
-                                    />
-                                </div>
+                                )}
                             </div>
-                        )}
 
-                        <button
-                            onClick={handleWhatsAppOrder}
-                            disabled={isSubmitting}
-                            className={`w-full py-3 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-900/10 ${isSubmitting
-                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                : 'bg-green-600 text-white hover:bg-green-700 hover:scale-[1.02]'
-                                }`}
-                        >
-                            {isSubmitting ? '...' : (
-                                <>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
-                                    Pedir por WhatsApp
-                                </>
-                            )}
-                        </button>
+                            {/* Submission */}
+                            <button
+                                onClick={handleWhatsAppOrder}
+                                disabled={isSubmitting}
+                                className="w-full py-6 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.5em] font-bold hover:translate-y-[-2px] transition-all disabled:opacity-50 shadow-2xl shadow-brand-ink/20"
+                            >
+                                {isSubmitting ? 'Procesando Transmisión...' : 'Transmitir Pedido vía WhatsApp'}
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

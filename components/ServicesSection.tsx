@@ -31,50 +31,40 @@ const services = [
 
 export const ServicesSection: React.FC = () => {
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div className="grid md:grid-cols-3 gap-10">
+    <section className="py-24 bg-brand-ivory">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        <div className="grid md:grid-cols-3 gap-0 border border-brand-ink/5 rounded-sm overflow-hidden bg-white shadow-2xl shadow-brand-ink/5">
           {services.map((service, index) => (
             <div
               key={index}
-              className={`group relative rounded-3xl p-8 transition-all duration-500 flex flex-col h-full border ${service.active
-                ? 'bg-[#1e3857] border-[#1e3857] text-white shadow-2xl scale-[1.02]'
-                : 'bg-white border-slate-100 text-slate-900 hover:border-[#44b6da]/20 hover:shadow-xl hover:-translate-y-1'
-                }`}
+              className={`group relative p-12 transition-all duration-700 flex flex-col h-full border-r border-brand-ink/5 last:border-r-0 opacity-0 animate-reveal shadow-inner shadow-brand-ink/[0.01]`}
+              style={{ animationDelay: `${0.1 * (index + 1)}s` }}
             >
-              {/* Decorative accent for non-active cards */}
-              {!service.active && (
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#44b6da]/5 rounded-bl-[5rem] -mr-8 -mt-8 transition-all group-hover:bg-[#44b6da]/10" />
-              )}
+              {/* Background Accent on Hover */}
+              <div className="absolute inset-x-0 bottom-0 h-0 bg-brand-ink group-hover:h-full transition-all duration-700 ease-in-out z-0"></div>
 
-              <div className={`mb-8 p-5 rounded-2xl inline-block w-fit transition-transform duration-500 group-hover:scale-110 ${service.active
-                ? 'bg-[#44b6da]/10 text-[#44b6da]'
-                : 'bg-slate-50 text-[#1e3857]'
-                }`}>
-                {service.icon}
-              </div>
+              <div className="relative z-10 space-y-12 h-full flex flex-col">
+                <div className={`w-16 h-16 bg-brand-ivory/80 border border-brand-ink/5 flex items-center justify-center rounded-full transition-all duration-500 group-hover:bg-brand-accent group-hover:border-brand-accent group-hover:rotate-[360deg] text-brand-ink group-hover:text-brand-ivory`}>
+                  {React.cloneElement(service.icon as React.ReactElement, { size: 24, strokeWidth: 1.5 })}
+                </div>
 
-              <h3 className="text-2xl font-bold mb-4 tracking-tight">
-                {service.title}
-              </h3>
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-medium tracking-tight display-font group-hover:text-brand-ivory transition-colors duration-500">
+                    {service.title}
+                  </h3>
+                  <p className="text-lg font-light leading-relaxed text-brand-ink/50 group-hover:text-brand-ivory/40 transition-colors duration-500">
+                    {service.description}
+                  </p>
+                </div>
 
-              <p className={`text-base mb-10 leading-relaxed ${service.active ? 'text-slate-300' : 'text-slate-600'
-                }`}>
-                {service.description}
-              </p>
-
-              <div className="mt-auto">
-                <Link
-                  to={service.linkPath}
-                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${service.active
-                    ? 'bg-[#44b6da] text-white hover:bg-[#39a5c8]'
-                    : 'bg-[#1e3857] text-white hover:bg-[#0f172a]'
-                    }`}
-                >
-                  {service.linkText}
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
+                <div className="mt-auto pt-12">
+                  <Link
+                    to={service.linkPath}
+                    className="inline-flex items-center gap-4 text-[10px] uppercase tracking-[0.4em] font-bold text-brand-ink group-hover:text-brand-accent transition-all duration-500"
+                  >
+                    — {service.linkText}
+                  </Link>
+                </div>
               </div>
             </div>
           ))}

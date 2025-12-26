@@ -45,7 +45,7 @@ function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans text-slate-900 bg-slate-50">
+    <div className="min-h-screen flex flex-col font-sans text-brand-ink bg-brand-ivory overflow-x-hidden w-full relative">
       <CartDrawer />
       {!isAdminRoute && <Navbar />}
 
