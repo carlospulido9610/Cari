@@ -67,6 +67,10 @@ export const AdminDashboard: React.FC = () => {
     const [selectedOrder, setSelectedOrder] = useState<QuoteEntry | null>(null);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
+    // Hover Image Preview State
+    const [hoverImage, setHoverImage] = useState<{ url: string; name: string; x: number; y: number } | null>(null);
+
+
     useEffect(() => {
         loadData();
     }, []);
@@ -588,6 +592,22 @@ export const AdminDashboard: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+            {/* Floating Hover Image Preview */}
+            {hoverImage && (
+                <div
+                    className="fixed z-[9999] pointer-events-none"
+                    style={{ left: hoverImage.x, top: hoverImage.y }}
+                >
+                    <div className="bg-white p-2 rounded-lg shadow-2xl border border-slate-300 ring-1 ring-black/5">
+                        <img
+                            src={hoverImage.url}
+                            alt={hoverImage.name}
+                            className="w-52 h-52 object-cover rounded"
+                        />
+                        <p className="text-xs text-slate-500 mt-1 text-center truncate max-w-[208px]">{hoverImage.name}</p>
+                    </div>
+                </div>
+            )}
             {/* Admin Header */}
             <div className="bg-slate-900 text-white px-8 py-4 flex justify-between items-center shadow-lg">
                 <h1 className="text-xl font-bold">Panel de Administración</h1>
@@ -731,21 +751,22 @@ export const AdminDashboard: React.FC = () => {
                                                 return (
                                                     <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                                                         <td className="p-4">
-                                                            <div className="relative group/img">
+                                                            <div
+                                                                className="relative"
+                                                                onMouseEnter={(e) => {
+                                                                    if (product.image_url) {
+                                                                        const rect = e.currentTarget.getBoundingClientRect();
+                                                                        setHoverImage({
+                                                                            url: product.image_url,
+                                                                            name: product.name,
+                                                                            x: rect.right + 10,
+                                                                            y: rect.top
+                                                                        });
+                                                                    }
+                                                                }}
+                                                                onMouseLeave={() => setHoverImage(null)}
+                                                            >
                                                                 <img src={product.image_url} alt="" className="w-10 h-10 rounded object-cover bg-slate-200 cursor-pointer" />
-                                                                {/* Hover Preview Tooltip - uses fixed to escape overflow */}
-                                                                {product.image_url && (
-                                                                    <div className="fixed left-[180px] mt-[-40px] z-[9999] hidden group-hover/img:block pointer-events-none">
-                                                                        <div className="bg-white p-2 rounded-lg shadow-2xl border border-slate-300 ring-1 ring-black/5">
-                                                                            <img
-                                                                                src={product.image_url}
-                                                                                alt={product.name}
-                                                                                className="w-52 h-52 object-cover rounded"
-                                                                            />
-                                                                            <p className="text-xs text-slate-500 mt-1 text-center truncate max-w-[208px]">{product.name}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
                                                             </div>
                                                         </td>
                                                         <td className="p-4 font-mono text-xs text-slate-500">
