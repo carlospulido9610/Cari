@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './Button';
 import { Product, QuoteRequest } from '../types';
-import { submitQuoteRequest } from '../services/supabaseClient';
+import { submitQuoteRequest } from '../src/services/supabaseClient';
 
 interface QuoteModalProps {
   isOpen: boolean;
@@ -13,10 +13,10 @@ interface QuoteModalProps {
   onError: (msg: string) => void;
 }
 
-export const QuoteModal: React.FC<QuoteModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  selectedProduct, 
+export const QuoteModal: React.FC<QuoteModalProps> = ({
+  isOpen,
+  onClose,
+  selectedProduct,
   products,
   onSuccess,
   onError
@@ -54,7 +54,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
     };
 
     const success = await submitQuoteRequest(submissionData);
-    
+
     if (success) {
       onSuccess("¡Solicitud de cotización recibida! Enviaremos los precios en breve.");
       onClose();
@@ -76,10 +76,10 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
   return (
     <div className="fixed inset-0 z-[60] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        
+
         {/* Backdrop */}
-        <div 
-          className="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity backdrop-blur-sm" 
+        <div
+          className="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity backdrop-blur-sm"
           aria-hidden="true"
           onClick={onClose}
         ></div>
@@ -142,41 +142,41 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
               </div>
 
               <div className="border-t border-slate-100 pt-4">
-                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Detalles del Pedido</label>
-                 <div className="space-y-3">
-                   <select
-                      name="product_id"
-                      className="block w-full rounded-md border-slate-300 bg-slate-50 border p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
-                      value={formData.product_id}
-                      onChange={handleChange}
-                   >
-                     <option value="">Seleccionar Producto (Opcional)</option>
-                     {products.map(p => (
-                       <option key={p.id} value={p.id}>{p.name} - ${p.price.toFixed(2)}</option>
-                     ))}
-                   </select>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Detalles del Pedido</label>
+                <div className="space-y-3">
+                  <select
+                    name="product_id"
+                    className="block w-full rounded-md border-slate-300 bg-slate-50 border p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    value={formData.product_id}
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccionar Producto (Opcional)</option>
+                    {products.map(p => (
+                      <option key={p.id} value={p.id}>{p.name} - ${p.price.toFixed(2)}</option>
+                    ))}
+                  </select>
 
-                   <div className="flex items-center space-x-2">
-                     <label className="text-sm text-slate-600 whitespace-nowrap">Cantidad:</label>
-                     <input
-                        type="number"
-                        name="quantity"
-                        min="1"
-                        className="block w-full rounded-md border-slate-300 bg-slate-50 border p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
-                        value={formData.quantity}
-                        onChange={handleChange}
-                      />
-                   </div>
-                   
-                   <textarea
-                     name="specifications"
-                     rows={3}
-                     placeholder="Especificaciones adicionales (ej. código de color, ancho del rollo, fecha límite)"
-                     className="block w-full rounded-md border-slate-300 bg-slate-50 border p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
-                     value={formData.specifications}
-                     onChange={handleChange}
-                   ></textarea>
-                 </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="text-sm text-slate-600 whitespace-nowrap">Cantidad:</label>
+                    <input
+                      type="number"
+                      name="quantity"
+                      min="1"
+                      className="block w-full rounded-md border-slate-300 bg-slate-50 border p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+                      value={formData.quantity}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <textarea
+                    name="specifications"
+                    rows={3}
+                    placeholder="Especificaciones adicionales (ej. código de color, ancho del rollo, fecha límite)"
+                    className="block w-full rounded-md border-slate-300 bg-slate-50 border p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    value={formData.specifications}
+                    onChange={handleChange}
+                  ></textarea>
+                </div>
               </div>
 
               <div className="mt-6">

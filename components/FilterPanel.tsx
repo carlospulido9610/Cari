@@ -229,7 +229,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     <div className="mt-auto pt-6 lg:hidden">
                         <Button
                             onClick={onClose}
-                            className="w-full bg-[#020617] text-white hover:bg-[#0f172a] py-4 rounded-xl font-bold"
+                            className="w-full bg-[#020617] text-white hover:bg-[#0f172a] py-4 rounded-full font-bold"
                         >
                             Ver Resultados
                         </Button>

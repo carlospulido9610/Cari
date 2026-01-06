@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Category, Product, ContactRequest, QuoteRequest, ContactEntry, QuoteEntry } from '../types';
-import { productCategories } from '../data/productCategories';
+import { Category, Product, ContactRequest, QuoteRequest, ContactEntry, QuoteEntry } from '../../types';
+import { productCategories } from '../../data/productCategories';
 
 // NOTE: Ideally, these would be in a .env file.
 // If not provided, the app will fall back to mock data for demonstration.
@@ -13,8 +13,10 @@ if (SUPABASE_URL && SUPABASE_KEY) {
   console.log('[Supabase] Initializing client with URL:', SUPABASE_URL);
   supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 } else {
-  console.warn('[Supabase] Credentials not found. URL exists?', !!SUPABASE_URL, 'Key exists?', !!SUPABASE_KEY);
-  console.warn('Using mock data.');
+  console.warn('[Supabase] Credentials not found in environment variables.');
+  console.warn('VITE_SUPABASE_URL:', SUPABASE_URL ? 'Found' : 'Missing');
+  console.warn('VITE_SUPABASE_ANON_KEY:', SUPABASE_KEY ? 'Found' : 'Missing');
+  console.warn('Falling back to mock data.');
 }
 
 // --- Mock Data for Demo Purposes ---

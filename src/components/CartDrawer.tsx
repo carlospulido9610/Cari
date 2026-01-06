@@ -69,7 +69,7 @@ export const CartDrawer: React.FC = () => {
             }).join(', ');
 
             // Save to Supabase
-            const { submitQuoteRequest } = await import('../../services/supabaseClient');
+            const { submitQuoteRequest } = await import('../services/supabaseClient');
 
             // Build shipping info for specifications
             let shippingInfo = '';
@@ -205,7 +205,7 @@ export const CartDrawer: React.FC = () => {
                                             ${(item.price * item.quantity).toFixed(2)}
                                         </span>
 
-                                        <div className="flex items-center border border-brand-ink/10 h-8 rounded-sm overflow-hidden">
+                                        <div className="flex items-center border border-brand-ink/10 h-8 rounded-xl overflow-hidden">
                                             <button
                                                 className="w-8 h-full flex items-center justify-center text-brand-ink/30 hover:text-brand-ink hover:bg-brand-ink/5 transition-colors"
                                                 onClick={() => updateQuantity(item.productId, item.quantity - 1, item.selectedVariant?.name, item.selectedColor)}
@@ -232,7 +232,7 @@ export const CartDrawer: React.FC = () => {
                     <div className="p-8 bg-white border-t border-brand-ink/5 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] z-20 overflow-y-auto max-h-[60vh]">
                         <div className="flex justify-between items-baseline mb-10">
                             <span className="text-[10px] font-bold text-brand-ink/40">Total</span>
-                            <span className="text-4xl font-light text-brand-ink tracking-tighter tabular-nums">${cartTotal.toFixed(2)}</span>
+                            <span className="text-4xl font-semibold text-brand-ink tracking-tighter display-font tabular-nums">${cartTotal.toFixed(2)}</span>
                         </div>
 
                         {/* Order Form */}
@@ -243,14 +243,14 @@ export const CartDrawer: React.FC = () => {
                                 <div className="space-y-4">
                                     <input
                                         type="text"
-                                        className="w-full bg-transparent border-b border-brand-ink/10 py-3 text-sm focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/20"
+                                        className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-sm focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/30 rounded-xl"
                                         placeholder="Nombre del Solicitante"
                                         value={customerName}
                                         onChange={(e) => setCustomerName(e.target.value)}
                                     />
                                     <input
                                         type="tel"
-                                        className="w-full bg-transparent border-b border-brand-ink/10 py-3 text-sm focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/20 tabular-nums"
+                                        className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-sm focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/30 tabular-nums rounded-xl"
                                         placeholder="Teléfono Corporativo"
                                         value={customerPhone}
                                         onChange={(e) => setCustomerPhone(e.target.value)}
@@ -263,13 +263,13 @@ export const CartDrawer: React.FC = () => {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={() => setDeliveryMethod('pickup')}
-                                        className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all ${deliveryMethod === 'pickup' ? 'border-brand-ink bg-brand-ink text-brand-ivory' : 'border-brand-ink/10 text-brand-ink/40'}`}
+                                        className={`flex-1 py-4 text-[10px] uppercase tracking-widest font-bold border transition-all rounded-full ${deliveryMethod === 'pickup' ? 'border-brand-ink bg-brand-ink text-brand-ivory' : 'border-brand-ink/10 text-brand-ink/40 bg-white'}`}
                                     >
                                         Retiro en Sede
                                     </button>
                                     <button
                                         onClick={() => setDeliveryMethod('shipping')}
-                                        className={`flex-1 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all ${deliveryMethod === 'shipping' ? 'border-brand-ink bg-brand-ink text-brand-ivory' : 'border-brand-ink/10 text-brand-ink/40'}`}
+                                        className={`flex-1 py-4 text-[10px] uppercase tracking-widest font-bold border transition-all rounded-full ${deliveryMethod === 'shipping' ? 'border-brand-ink bg-brand-ink text-brand-ivory' : 'border-brand-ink/10 text-brand-ink/40 bg-white'}`}
                                     >
                                         Envío Nacional
                                     </button>
@@ -295,7 +295,7 @@ export const CartDrawer: React.FC = () => {
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <select
-                                                className="bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none"
+                                                className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-xs focus:border-brand-ink outline-none rounded-xl"
                                                 value={shippingAgency}
                                                 onChange={(e) => setShippingAgency(e.target.value as ShippingAgency)}
                                             >
@@ -304,7 +304,7 @@ export const CartDrawer: React.FC = () => {
                                             </select>
                                             <input
                                                 type="text"
-                                                className="bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none placeholder:text-brand-ink/20"
+                                                className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-xs focus:border-brand-ink outline-none placeholder:text-brand-ink/30 rounded-xl"
                                                 placeholder="Ciudad"
                                                 value={shippingCity}
                                                 onChange={(e) => setShippingCity(e.target.value)}
@@ -312,7 +312,7 @@ export const CartDrawer: React.FC = () => {
                                         </div>
                                         <input
                                             type="text"
-                                            className="w-full bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none placeholder:text-brand-ink/20"
+                                            className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-xs focus:border-brand-ink outline-none placeholder:text-brand-ink/30 rounded-xl"
                                             placeholder="Dirección Detallada de Agencia"
                                             value={shippingAddress}
                                             onChange={(e) => setShippingAddress(e.target.value)}
@@ -320,7 +320,7 @@ export const CartDrawer: React.FC = () => {
                                         <div className="grid grid-cols-2 gap-4">
                                             <input
                                                 type="text"
-                                                className="bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none disabled:opacity-30"
+                                                className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-xs focus:border-brand-ink outline-none disabled:opacity-30 rounded-xl"
                                                 placeholder="Destinatario"
                                                 value={shippingName}
                                                 onChange={(e) => setShippingName(e.target.value)}
@@ -328,7 +328,7 @@ export const CartDrawer: React.FC = () => {
                                             />
                                             <input
                                                 type="text"
-                                                className="bg-transparent border-b border-brand-ink/10 py-2 text-xs focus:border-brand-ink outline-none"
+                                                className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-xs focus:border-brand-ink outline-none rounded-xl"
                                                 placeholder="ID / Cédula"
                                                 value={shippingCedula}
                                                 onChange={(e) => setShippingCedula(e.target.value)}
@@ -342,7 +342,7 @@ export const CartDrawer: React.FC = () => {
                             <button
                                 onClick={handleWhatsAppOrder}
                                 disabled={isSubmitting}
-                                className="w-full py-6 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.5em] font-bold hover:translate-y-[-2px] transition-all disabled:opacity-50 shadow-2xl shadow-brand-ink/20"
+                                className="w-full py-6 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.5em] font-bold hover:translate-y-[-2px] transition-all disabled:opacity-50 shadow-2xl shadow-brand-ink/20 rounded-full"
                             >
                                 {isSubmitting ? 'Procesando Transmisión...' : 'Transmitir Pedido vía WhatsApp'}
                             </button>

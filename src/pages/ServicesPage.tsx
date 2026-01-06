@@ -18,17 +18,17 @@ export const ServicesPage: React.FC = () => {
                     <div className="max-w-4xl">
 
 
-                        <h1 className="text-5xl md:text-8xl font-medium text-brand-ink mb-10 tracking-tight leading-[1.05] display-font opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
+                        <h1 className="text-5xl md:text-8xl font-medium text-brand-gold mb-10 tracking-tight leading-[1.05] display-font opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
                             Elevamos tu producción <br />
                             <span className="font-bold">al siguiente nivel.</span>
                         </h1>
 
-                        <p className="text-xl md:text-2xl text-brand-ink/60 leading-relaxed mb-12 max-w-2xl font-light opacity-0 animate-reveal" style={{ animationDelay: '0.3s' }}>
+                        <p className="text-xl md:text-2xl text-brand-ink/60 leading-relaxed mb-12 max-w-2xl font-medium opacity-0 animate-reveal" style={{ animationDelay: '0.3s' }}>
                             Desde el diseño conceptual hasta la entrega final, proporcionamos la infraestructura y los insumos técnicos que las marcas de lujo necesitan.
                         </p>
 
                         <div className="flex flex-wrap gap-8 opacity-0 animate-reveal" style={{ animationDelay: '0.4s' }}>
-                            <Link to="/contacto" className="px-10 py-5 bg-brand-ink text-brand-ivory text-xs uppercase tracking-widest font-bold transition-all hover:bg-brand-ink/90 hover:translate-y-[-2px] shadow-xl shadow-brand-ink/10">
+                            <Link to="/contacto" className="px-10 py-5 bg-brand-ink text-brand-ivory text-xs uppercase tracking-widest font-bold transition-all hover:bg-brand-ink/90 hover:translate-y-[-2px] shadow-xl shadow-brand-ink/10 rounded-full">
                                 Iniciar Proyecto
                             </Link>
                             <a href="#proceso" className="group flex items-center space-x-4 px-4 py-5 text-xs uppercase tracking-widest font-bold text-brand-ink border-b border-brand-ink/10 transition-all hover:border-brand-ink">
@@ -50,7 +50,7 @@ export const ServicesPage: React.FC = () => {
                         </div>
                         <h2 className="text-4xl md:text-5xl font-medium text-brand-ink display-font">Nuestras Especialidades</h2>
                     </div>
-                    <p className="text-brand-ink/50 max-w-md font-light text-lg">Combinamos precisión técnica con materiales de la más alta calidad para ofrecer resultados excepcionales y consistentes.</p>
+                    <p className="text-brand-ink/50 max-w-md font-medium text-lg">Combinamos precisión técnica con materiales de la más alta calidad para ofrecer resultados excepcionales y consistentes.</p>
                 </div>
                 <ServicesSection />
             </div>
@@ -70,7 +70,7 @@ export const ServicesPage: React.FC = () => {
                                     ¿Cómo <br />
                                     <span className="font-bold">trabajamos?</span>
                                 </h2>
-                                <p className="text-brand-ivory/60 text-lg leading-relaxed font-light">
+                                <p className="text-brand-ivory/60 text-lg leading-relaxed font-medium">
                                     Un proceso simplificado diseñado para garantizar la calidad suprema en cada etapa del desarrollo.
                                 </p>
                             </div>
@@ -85,14 +85,14 @@ export const ServicesPage: React.FC = () => {
                             ].map((item, idx) => (
                                 <div key={idx} className="group relative grid grid-cols-1 md:grid-cols-12 gap-6 pb-12 border-b border-brand-ivory/10 last:border-0 hover:bg-brand-ivory/[0.02] transition-colors p-4 -m-4 rounded-xl">
                                     <div className="md:col-span-2 flex items-start justify-between md:justify-start">
-                                        <span className="text-5xl font-light text-brand-ivory/10 group-hover:text-brand-accent/40 transition-colors">{item.step}</span>
+                                        <span className="text-5xl font-medium text-brand-ivory/10 group-hover:text-brand-accent/40 transition-colors">{item.step}</span>
                                         <div className="text-brand-accent p-3 bg-brand-accent/10 rounded-full md:hidden">
                                             {React.cloneElement(item.icon as React.ReactElement, { className: 'w-5 h-5' })}
                                         </div>
                                     </div>
                                     <div className="md:col-span-8 space-y-3">
                                         <h3 className="text-2xl font-medium display-font group-hover:text-white transition-colors">{item.title}</h3>
-                                        <p className="text-brand-ivory/50 font-light leading-relaxed max-w-lg">{item.desc}</p>
+                                        <p className="text-brand-ivory/50 font-medium leading-relaxed max-w-lg">{item.desc}</p>
                                     </div>
                                     <div className="md:col-span-2 hidden md:flex justify-end items-start pt-2">
                                         <div className="text-brand-accent p-4 bg-brand-accent/10 rounded-full opacity-40 group-hover:opacity-100 transition-opacity">
@@ -119,15 +119,15 @@ export const ServicesPage: React.FC = () => {
                         ¿Listo para <span className="font-bold">transformar</span> tu marca?
                     </h2>
 
-                    <p className="text-lg md:text-xl text-brand-ink/50 mb-14 max-w-2xl mx-auto leading-relaxed font-light">
+                    <p className="text-lg md:text-xl text-brand-ink/50 mb-14 max-w-2xl mx-auto leading-relaxed font-medium">
                         Únete a las marcas líderes que confían en nuestra infraestructura para llevar sus diseños a la realidad internacional.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
-                        <Link to="/contacto" className="w-full sm:w-auto px-12 py-5 bg-brand-ink text-brand-ivory text-xs uppercase tracking-widest font-bold shadow-2xl shadow-brand-ink/10 hover:translate-y-[-2px] transition-all">
+                        <Link to="/contacto" className="w-full sm:w-auto px-12 py-5 bg-brand-ink text-brand-ivory text-xs uppercase tracking-widest font-bold shadow-2xl shadow-brand-ink/10 hover:translate-y-[-2px] transition-all rounded-full">
                             Iniciar Colaboración
                         </Link>
-                        <Link to="/cotizar" className="w-full sm:w-auto px-12 py-5 bg-transparent text-brand-ink border border-brand-ink/10 text-xs uppercase tracking-widest font-bold hover:bg-brand-ink hover:text-brand-ivory transition-all">
+                        <Link to="/cotizar" className="w-full sm:w-auto px-12 py-5 bg-transparent text-brand-ink border border-brand-ink/10 text-xs uppercase tracking-widest font-bold hover:bg-brand-ink hover:text-brand-ivory transition-all rounded-full">
                             Pedir Cotización
                         </Link>
                     </div>

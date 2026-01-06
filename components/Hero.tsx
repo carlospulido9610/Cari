@@ -24,14 +24,14 @@ export const Hero: React.FC = () => {
           <div className="lg:col-span-8 flex flex-col space-y-10">
 
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium text-brand-ink tracking-tight leading-[1.05] display-font opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium text-brand-gold tracking-tight leading-[1.05] display-font opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
               Redefiniendo la <br />
               <span className="font-bold">excelencia</span> textil.
             </h1>
 
             <div className="flex flex-col md:flex-row md:items-start gap-12 opacity-0 animate-reveal" style={{ animationDelay: '0.3s' }}>
               <div className="max-w-md">
-                <p className="text-lg md:text-xl text-brand-ink/70 leading-relaxed font-normal">
+                <p className="text-lg md:text-xl text-brand-ink/70 leading-relaxed font-medium">
                   Provisión exclusiva de insumos y servicios técnicos de producción para diseñadores que buscan trascender lo ordinario.
                 </p>
 
@@ -41,7 +41,7 @@ export const Hero: React.FC = () => {
                     onClick={() => navigate('/productos')}
                     className="bg-brand-ink hover:bg-brand-ink/90 text-brand-ivory px-10 py-5 text-sm uppercase tracking-widest font-semibold transition-all hover:translate-y-[-2px] hover:shadow-2xl shadow-brand-ink/20"
                   >
-                    Explorar Colección
+                    Explorar Catálogo
                   </Button>
                   <button
                     onClick={() => navigate('/cotizar')}
@@ -52,29 +52,30 @@ export const Hero: React.FC = () => {
                   </button>
                 </div>
               </div>
-
-              {/* Secondary Details for Desktop */}
-              <div className="hidden md:block flex-1 border-l border-brand-ink/10 pl-10 space-y-6">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] font-bold text-brand-ink/40 mb-2">Compromiso</p>
-                  <p className="text-sm font-medium text-brand-ink/80">Estándares de calidad de nivel internacional.</p>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] font-bold text-brand-ink/40 mb-2">Servicio</p>
-                  <p className="text-sm font-medium text-brand-ink/80">Acompañamiento técnico 360° en confección.</p>
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Abstract Visual Element (Replacing standard images with curated geometry) */}
+          {/* Editorial Product Image */}
           <div className="lg:col-span-4 hidden lg:flex justify-end opacity-0 animate-reveal" style={{ animationDelay: '0.5s' }}>
-            <div className="relative w-72 h-[450px] bg-brand-ink/5 overflow-hidden group">
-              <div className="absolute inset-4 border border-brand-ink/10 z-10 transition-transform duration-700 group-hover:scale-95" />
-              <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/20 to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-brand-gold/30 rounded-full animate-float" />
-              <div className="absolute bottom-8 left-8 right-8 text-[10px] uppercase tracking-widest leading-loose font-medium text-brand-ink/40">
-                Texturas, herrajes y soluciones técnicas para la industria de la moda contemporánea.
+            <div className="relative w-80 h-[480px] overflow-hidden group">
+              {/* Decorative frame */}
+              <div className="absolute inset-0 border border-brand-ink/10 z-20 pointer-events-none transition-all duration-700 group-hover:inset-3" />
+
+              {/* Main image */}
+              <img
+                src="/images/hero-hardware.jpg"
+                alt="Detalle de herraje dorado en traje de baño"
+                className="w-full h-full object-cover grayscale-[0.1] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
+              />
+
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-ink/40 via-transparent to-transparent opacity-60 z-10" />
+
+              {/* Caption */}
+              <div className="absolute bottom-6 left-6 right-6 z-20">
+                <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-brand-ivory/80">
+                  Herrajes Premium
+                </p>
               </div>
             </div>
           </div>

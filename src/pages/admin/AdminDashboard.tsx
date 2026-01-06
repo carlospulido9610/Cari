@@ -5,7 +5,7 @@ import {
     fetchCategories, createCategory, updateCategory, deleteCategory,
     uploadProductImage, fetchContacts, fetchQuotes, deleteContact, deleteQuote,
     updateContact, updateQuote, fetchProductById
-} from '../../../services/supabaseClient';
+} from '../../services/supabaseClient';
 import { Product, Category, ProductVariant, ContactEntry, QuoteEntry } from '../../../types';
 import { Button } from '../../../components/Button';
 import { Plus, Edit, Trash2, LogOut, CheckCircle, XCircle, Upload, Folder, Package, Search, Filter, MessageSquare, FileText, Scissors } from 'lucide-react';

@@ -5,6 +5,7 @@ import { Hero } from './components/Hero';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
 import { ServicesSection } from './components/ServicesSection';
+import { ProcessSection } from './components/ProcessSection';
 import { ProductsPage } from './src/pages/ProductsPage';
 import { QuotePage } from './src/pages/QuotePage';
 import { ServicesPage } from './src/pages/ServicesPage';
@@ -23,6 +24,7 @@ function HomePage() {
     <>
       <Hero />
       <ServicesSection />
+      <ProcessSection />
       {/* Home page can be expanded later with teasers */}
     </>
   );

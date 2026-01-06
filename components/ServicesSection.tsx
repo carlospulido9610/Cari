@@ -33,26 +33,24 @@ export const ServicesSection: React.FC = () => {
   return (
     <section className="py-24 bg-brand-ivory">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="grid md:grid-cols-3 gap-0 border border-brand-ink/5 rounded-sm overflow-hidden bg-white shadow-2xl shadow-brand-ink/5">
+        <div className="grid md:grid-cols-3 gap-6 overflow-hidden">
           {services.map((service, index) => (
             <div
               key={index}
-              className={`group relative p-12 transition-all duration-700 flex flex-col h-full border-r border-brand-ink/5 last:border-r-0 opacity-0 animate-reveal shadow-inner shadow-brand-ink/[0.01]`}
+              className={`group relative p-10 transition-all duration-500 flex flex-col h-full bg-white rounded-2xl shadow-md hover:shadow-xl opacity-0 animate-reveal border border-brand-ink/5`}
               style={{ animationDelay: `${0.1 * (index + 1)}s` }}
             >
-              {/* Background Accent on Hover */}
-              <div className="absolute inset-x-0 bottom-0 h-0 bg-brand-ink group-hover:h-full transition-all duration-700 ease-in-out z-0"></div>
 
               <div className="relative z-10 space-y-12 h-full flex flex-col">
-                <div className={`w-16 h-16 bg-brand-ivory/80 border border-brand-ink/5 flex items-center justify-center rounded-full transition-all duration-500 group-hover:bg-brand-accent group-hover:border-brand-accent group-hover:rotate-[360deg] text-brand-ink group-hover:text-brand-ivory`}>
+                <div className={`w-16 h-16 bg-brand-ivory border border-brand-ink/5 flex items-center justify-center rounded-full transition-all duration-500 group-hover:bg-brand-accent group-hover:border-brand-accent group-hover:rotate-[360deg] text-brand-ink group-hover:text-white`}>
                   {React.cloneElement(service.icon as React.ReactElement, { size: 24, strokeWidth: 1.5 })}
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-2xl font-medium tracking-tight display-font group-hover:text-brand-ivory transition-colors duration-500">
+                  <h3 className="text-2xl font-medium tracking-tight display-font text-brand-gold transition-colors duration-500">
                     {service.title}
                   </h3>
-                  <p className="text-lg font-light leading-relaxed text-brand-ink/50 group-hover:text-brand-ivory/40 transition-colors duration-500">
+                  <p className="text-lg font-medium leading-relaxed text-brand-ink/70 transition-colors duration-500">
                     {service.description}
                   </p>
                 </div>

@@ -4,7 +4,7 @@ import { Menu, X, Search, ShoppingBag } from 'lucide-react';
 import { Button } from './Button';
 import { Logo } from './Logo';
 import { ProductsDropdown } from './ProductsDropdown';
-import { fetchCategories } from '../services/supabaseClient';
+import { fetchCategories } from '../src/services/supabaseClient';
 import { Category } from '../types';
 import { useCart } from '../src/context/CartContext';
 
@@ -154,16 +154,6 @@ export const Navbar: React.FC = () => {
           {/* Mobile Actions */}
           <div className="md:hidden flex items-center gap-2">
             <button
-              className="p-2 text-brand-ink/70 hover:text-brand-ink transition-colors"
-              onClick={() => {
-                setMobileSearchOpen(!mobileSearchOpen);
-                setIsOpen(false);
-              }}
-            >
-              <Search className="w-6 h-6 stroke-[1.5px]" />
-            </button>
-
-            <button
               className="relative p-2 text-brand-ink/70 hover:text-brand-ink transition-colors"
               onClick={() => setIsCartOpen(true)}
             >
@@ -176,21 +166,32 @@ export const Navbar: React.FC = () => {
             </button>
 
             <button
-              onClick={() => {
-                setIsOpen(!isOpen);
-                setMobileSearchOpen(false);
-              }}
+              onClick={() => setIsOpen(!isOpen)}
               className="p-2 text-brand-ink/70 hover:text-brand-ink transition-colors focus:outline-none"
             >
               {isOpen ? <X size={24} className="stroke-[1.5px]" /> : <Menu size={24} className="stroke-[1.5px]" />}
             </button>
           </div>
         </div>
-      </div>
+      </div >
 
-      {/* Mobile Search Bar Dropdown */}
-      <div className={`md:hidden absolute top-full left-0 mt-4 w-full px-6 pointer-events-auto transition-all duration-500 ease-out z-40 ${mobileSearchOpen ? 'max-h-24 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4 overflow-hidden'}`}>
-        <div className="bg-brand-ivory/95 backdrop-blur-2xl shadow-2xl rounded-2xl border border-brand-ink/5 p-4">
+
+
+      {/* Mobile Menu Backdrop */}
+      {
+        isOpen && (
+          <div
+            className="fixed inset-0 bg-brand-ink/10 z-40 md:hidden pointer-events-auto backdrop-blur-sm transition-opacity duration-500"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+        )
+      }
+
+      {/* Mobile Menu Dropdown */}
+      <div className={`md:hidden absolute top-full left-0 mt-4 w-full px-6 pointer-events-auto transition-all duration-500 ease-out z-50 ${isOpen ? 'max-h-[80vh] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4 overflow-hidden'}`}>
+        <div className="bg-brand-ivory/95 backdrop-blur-2xl shadow-2xl rounded-3xl border border-brand-ink/5 p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+          {/* Mobile Search Bar - Inside Menu */}
           <form onSubmit={handleSearch} className="relative">
             <input
               ref={mobileSearchInputRef}
@@ -201,29 +202,8 @@ export const Navbar: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-ink/40" />
-            <button
-              type="button"
-              onClick={() => setMobileSearchOpen(false)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-ink/40 hover:text-brand-ink p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
           </form>
-        </div>
-      </div>
 
-      {/* Mobile Menu Backdrop */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-brand-ink/10 z-40 md:hidden pointer-events-auto backdrop-blur-sm transition-opacity duration-500"
-          onClick={() => setIsOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Mobile Menu Dropdown */}
-      <div className={`md:hidden absolute top-full left-0 mt-4 w-full px-6 pointer-events-auto transition-all duration-500 ease-out z-50 ${isOpen ? 'max-h-[80vh] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4 overflow-hidden'}`}>
-        <div className="bg-brand-ivory/95 backdrop-blur-2xl shadow-2xl rounded-3xl border border-brand-ink/5 p-6 space-y-6 max-h-[70vh] overflow-y-auto">
           <div className="space-y-4">
             <Link
               to="/"
@@ -249,7 +229,7 @@ export const Navbar: React.FC = () => {
             ))}
             <div className="pt-8">
               <Button
-                className="w-full bg-brand-ink hover:bg-brand-ink/90 text-brand-ivory rounded-xl py-5 text-sm uppercase tracking-widest font-bold shadow-xl shadow-brand-ink/10"
+                className="w-full bg-brand-ink hover:bg-brand-ink/90 text-brand-ivory rounded-full py-5 text-sm uppercase tracking-widest font-bold shadow-xl shadow-brand-ink/10"
                 onClick={() => {
                   setIsOpen(false);
                   setIsCartOpen(true);
@@ -262,6 +242,6 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
-    </nav>
+    </nav >
   );
 };

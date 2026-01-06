@@ -110,10 +110,10 @@ export const FAQPage: React.FC = () => {
                 {/* Header */}
                 <div className="text-center mb-24 opacity-0 animate-reveal" style={{ animationDelay: '0.1s' }}>
 
-                    <h1 className="text-4xl md:text-6xl font-medium text-brand-ink display-font mb-6">
+                    <h1 className="text-4xl md:text-6xl font-medium text-brand-gold display-font mb-6">
                         Preguntas <span className="font-bold">frecuentes</span>
                     </h1>
-                    <p className="text-brand-ink/40 font-light text-lg max-w-2xl mx-auto">
+                    <p className="text-brand-ink/40 font-medium text-lg max-w-2xl mx-auto">
                         Resolviendo sus dudas técnicas sobre insumos, tiempos de despacho y procesos de personalización de alto nivel.
                     </p>
                 </div>
@@ -131,7 +131,7 @@ export const FAQPage: React.FC = () => {
                                     setOpenIndex(null);
                                 }}
                                 className={`
-                                    px-6 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all duration-300
+                                    px-6 py-3 text-[10px] uppercase tracking-widest font-bold border transition-all duration-300 rounded-full
                                     ${isActive
                                         ? 'border-brand-ink bg-brand-ink text-brand-ivory'
                                         : 'border-brand-ink/5 text-brand-ink/40 hover:border-brand-ink/20'
@@ -169,7 +169,7 @@ export const FAQPage: React.FC = () => {
                                         ${isOpen ? 'max-h-[500px] pb-8' : 'max-h-0'}
                                     `}
                                 >
-                                    <p className="text-brand-ink/50 leading-relaxed font-light text-lg">
+                                    <p className="text-brand-ink/50 leading-relaxed font-medium text-lg">
                                         {faq.answer}
                                     </p>
                                 </div>
@@ -180,20 +180,20 @@ export const FAQPage: React.FC = () => {
 
                 {/* Contact CTA - Premium Finish */}
                 <div className="mt-48 opacity-0 animate-reveal" style={{ animationDelay: '0.4s' }}>
-                    <div className="relative p-12 md:p-20 text-center bg-brand-ink rounded-sm overflow-hidden">
+                    <div className="relative p-12 md:p-20 text-center bg-brand-ink rounded-2xl overflow-hidden">
                         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-accent/30 to-transparent"></div>
 
                         <div className="relative z-10 space-y-8 flex flex-col items-center">
                             <h3 className="text-3xl md:text-5xl font-medium text-brand-ivory display-font">
                                 ¿Requiere asistencia <span className="font-bold">personalizada?</span>
                             </h3>
-                            <p className="text-brand-ivory/40 max-w-xl text-lg font-light leading-relaxed">
+                            <p className="text-brand-ivory/40 max-w-xl text-lg font-medium leading-relaxed">
                                 Nuestros consultores técnicos están disponibles para orientar su elección de insumos según las necesidades de su marca.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-6 justify-center w-full sm:w-auto pt-4">
                                 <a
                                     href="/contacto"
-                                    className="px-12 py-5 bg-brand-ivory text-brand-ink text-[10px] uppercase tracking-[0.5em] font-bold hover:translate-y-[-2px] transition-all shadow-2xl"
+                                    className="px-12 py-5 bg-brand-ivory text-brand-ink text-[10px] uppercase tracking-[0.5em] font-bold hover:translate-y-[-2px] transition-all shadow-2xl rounded-full"
                                 >
                                     Hablar con el Centro Técnico
                                 </a>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Product, ProductVariant, Category } from '../../types';
-import { fetchProductById, fetchProducts, fetchCategories } from '../../services/supabaseClient';
+import { fetchProductById, fetchProducts, fetchCategories } from '../services/supabaseClient';
 import { Button } from '../../components/Button';
 import { ArrowLeft, ShoppingBag, Truck, ShieldCheck, Phone, Check, AlertCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -141,16 +141,16 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen pt-24 pb-12 flex justify-center items-center bg-[#fdfdfd]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#44b6da]"></div>
+            <div className="min-h-screen pt-24 pb-12 flex justify-center items-center bg-brand-ivory">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-accent"></div>
             </div>
         );
     }
 
     if (!product) {
         return (
-            <div className="min-h-screen pt-24 pb-12 px-4 text-center bg-[#fdfdfd]">
-                <h2 className="text-2xl font-bold text-[#1e3857] mb-4">Producto no encontrado</h2>
+            <div className="min-h-screen pt-24 pb-12 px-4 text-center bg-brand-ivory">
+                <h2 className="text-2xl font-bold text-brand-gold mb-4">Producto no encontrado</h2>
                 <Button onClick={() => navigate('/productos')}>Volver al catálogo</Button>
             </div>
         );
@@ -176,7 +176,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
 
                         {/* Image Section - Hero Scale */}
                         <div className="lg:col-span-7 space-y-8 opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
-                            <div className="relative aspect-[4/5] bg-brand-ink/[0.02] overflow-hidden rounded-sm border border-brand-ink/5">
+                            <div className="relative aspect-[4/5] bg-brand-ink/[0.02] overflow-hidden rounded-2xl border border-brand-ink/5">
                                 <img
                                     src={displayImage}
                                     alt={product.name}
@@ -199,7 +199,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                                 <button
                                                     key={idx}
                                                     onClick={() => setDisplayImage(img)}
-                                                    className={`flex-shrink-0 w-24 h-24 rounded-sm overflow-hidden border transition-all ${displayImage === img ? 'border-brand-ink' : 'border-brand-ink/5 hover:border-brand-ink/20 opacity-60 hover:opacity-100'}`}
+                                                    className={`flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden border transition-all ${displayImage === img ? 'border-brand-ink' : 'border-brand-ink/5 hover:border-brand-ink/20 opacity-60 hover:opacity-100'}`}
                                                 >
                                                     <img
                                                         src={img}
@@ -257,7 +257,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                 {product.description && (
                                     <div className="space-y-4">
                                         <h4 className="text-[11px] uppercase tracking-widest font-bold text-brand-ink/40">Descripción</h4>
-                                        <p className="text-brand-ink/60 text-lg font-light leading-relaxed">
+                                        <p className="text-brand-ink/60 text-lg font-medium leading-relaxed">
                                             {product.description}
                                         </p>
                                     </div>
@@ -282,7 +282,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                                         onClick={() => !isOutOfStock && handleVariantSelect(variant)}
                                                         disabled={isOutOfStock}
                                                         className={`
-                                                        px-6 py-3 border text-[10px] uppercase tracking-widest font-bold font-sans transition-all duration-300
+                                                        px-6 py-3 border text-[10px] uppercase tracking-widest font-bold font-sans transition-all duration-300 rounded-full
                                                         ${isOutOfStock
                                                                 ? 'opacity-20 cursor-not-allowed grayscale'
                                                                 : selectedVariant?.id === variant.id
@@ -311,7 +311,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                                     key={color}
                                                     onClick={() => setActiveColor(color)}
                                                     className={`
-                                                        px-4 py-2 text-[10px] uppercase tracking-widest font-bold border transition-all duration-300
+                                                        px-4 py-2 text-[10px] uppercase tracking-widest font-bold border transition-all duration-300 rounded-full
                                                         ${activeColor === color
                                                             ? 'border-brand-ink bg-brand-ink/5 text-brand-ink'
                                                             : 'border-brand-ink/5 text-brand-ink/40 hover:border-brand-ink/20'
@@ -334,7 +334,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                             <button
                                                 onClick={() => setQuantity(Math.max(product.min_quantity || 1, (typeof quantity === 'number' ? quantity : 1) - 1))}
                                                 disabled={(typeof quantity === 'number' ? quantity : 1) <= (product.min_quantity || 1)}
-                                                className="text-brand-ink/30 hover:text-brand-ink font-light text-2xl transition-colors disabled:opacity-10"
+                                                className="text-brand-ink/30 hover:text-brand-ink font-medium text-2xl transition-colors disabled:opacity-10"
                                             >
                                                 &minus;
                                             </button>
@@ -361,7 +361,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                             <button
                                                 onClick={() => setQuantity(Math.min(displayStock, (typeof quantity === 'number' ? quantity : 1) + 1))}
                                                 disabled={(typeof quantity === 'number' ? quantity : 1) >= displayStock}
-                                                className="text-brand-ink/30 hover:text-brand-ink font-light text-2xl transition-colors disabled:opacity-10"
+                                                className="text-brand-ink/30 hover:text-brand-ink font-medium text-2xl transition-colors disabled:opacity-10"
                                             >
                                                 &#43;
                                             </button>
@@ -376,7 +376,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                             {/* Action Area */}
                             <div className="mt-16 pt-12 border-t border-brand-ink/5 flex flex-col gap-6">
                                 <button
-                                    className={`w-full py-6 text-[10px] uppercase tracking-[0.5em] font-bold transition-all duration-500 shadow-2xl ${isAdding ? 'bg-brand-accent text-brand-ivory' : 'bg-brand-ink text-brand-ivory hover:translate-y-[-2px] shadow-brand-ink/20'}`}
+                                    className={`w-full py-6 text-[10px] uppercase tracking-[0.5em] font-bold transition-all duration-500 shadow-2xl rounded-full ${isAdding ? 'bg-brand-accent text-brand-ivory' : 'bg-brand-ink text-brand-ivory hover:translate-y-[-2px] shadow-brand-ink/20'}`}
                                     onClick={handleAddToCart}
                                     disabled={isAdding || displayStock === 0}
                                 >
@@ -384,7 +384,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                 </button>
 
                                 {product.is_customizable && (
-                                    <div className="flex flex-col items-center justify-center p-6 bg-brand-ink/[0.02] border border-brand-ink/5 rounded-sm space-y-2">
+                                    <div className="flex flex-col items-center justify-center p-6 bg-brand-ink/[0.02] border border-brand-ink/5 rounded-2xl space-y-2">
                                         <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-ink/60">Servicio de Personalización</span>
                                         {product.customization_price && product.customization_price > 0 && (
                                             <span className="text-[10px] font-bold text-brand-accent">
@@ -409,7 +409,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                 <div key={idx} className="space-y-3">
                                     <feature.icon className="w-5 h-5 text-brand-ink/20 stroke-[1.5px]" />
                                     <h4 className="text-[11px] uppercase tracking-widest font-bold text-brand-ink">{feature.title}</h4>
-                                    <p className="text-xs text-brand-ink/40 font-light leading-relaxed">{feature.desc}</p>
+                                    <p className="text-xs text-brand-ink/40 font-medium leading-relaxed">{feature.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -436,7 +436,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                         className="group cursor-pointer flex flex-col space-y-6"
                                         style={{ marginTop: index % 2 === 0 ? '0' : '2rem' }}
                                     >
-                                        <div className="aspect-[4/5] relative overflow-hidden bg-brand-ink/[0.02] rounded-sm">
+                                        <div className="aspect-[4/5] relative overflow-hidden bg-brand-ink/[0.02] rounded-2xl">
                                             <div className="absolute inset-0 border border-brand-ink/5 z-10 pointer-events-none group-hover:inset-4 transition-all duration-700" />
                                             <img
                                                 src={related.image_url}

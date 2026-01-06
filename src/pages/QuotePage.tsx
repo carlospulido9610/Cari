@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { Product, QuoteRequest } from '../../types';
-import { submitQuoteRequest, fetchProducts } from '../../services/supabaseClient';
+import { submitQuoteRequest, fetchProducts } from '../services/supabaseClient';
 import { useCart } from '../context/CartContext';
 
 const SERVICE_OPTIONS = [
@@ -130,10 +130,10 @@ export const QuotePage: React.FC<QuotePageProps> = ({
       <div className="max-w-2xl mx-auto px-6 relative z-10">
         <div className="mb-16 text-center opacity-0 animate-reveal" style={{ animationDelay: '0.1s' }}>
 
-          <h1 className="text-4xl md:text-6xl font-medium text-brand-ink display-font mb-4">
+          <h1 className="text-4xl md:text-6xl font-medium text-brand-gold display-font mb-4">
             Solicitar <span className="font-bold">cotización</span>
           </h1>
-          <p className="text-brand-ink/40 font-light text-lg">Inicie su proyecto con nosotros. Recibirá una respuesta técnica en menos de 24h.</p>
+          <p className="text-brand-ink/40 font-medium text-lg">Inicie su proyecto con nosotros. Recibirá una respuesta técnica en menos de 24h.</p>
         </div>
 
         <div className="bg-transparent opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
@@ -186,7 +186,7 @@ export const QuotePage: React.FC<QuotePageProps> = ({
               <h3 className="text-[11px] uppercase tracking-[0.3em] font-bold text-brand-ink/30 border-b border-brand-ink/5 pb-4 display-font">Especificaciones del Pedido</h3>
 
               {items.length > 0 ? (
-                <div className="bg-brand-ink/[0.02] border border-brand-ink/5 p-8 rounded-sm space-y-6">
+                <div className="bg-brand-ink/[0.02] border border-brand-ink/5 p-8 rounded-2xl space-y-6">
                   <div className="flex items-center justify-between border-b border-brand-ink/5 pb-4">
                     <span className="text-[10px] uppercase tracking-widest font-bold text-brand-ink/60">Resumen de Selección ({items.length})</span>
                     <span className="text-[10px] uppercase tracking-widest font-bold text-brand-accent">Est. ${items.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2)}</span>
@@ -195,7 +195,7 @@ export const QuotePage: React.FC<QuotePageProps> = ({
                     {items.map((item, idx) => (
                       <div key={idx} className="flex gap-6 items-start">
                         {item.image && (
-                          <div className="w-16 h-16 bg-white border border-brand-ink/5 rounded-sm overflow-hidden flex-shrink-0 p-2">
+                          <div className="w-16 h-16 bg-white border border-brand-ink/5 rounded-xl overflow-hidden flex-shrink-0 p-2">
                             <img src={item.image} alt={item.productName} className="w-full h-full object-contain" />
                           </div>
                         )}
@@ -217,7 +217,7 @@ export const QuotePage: React.FC<QuotePageProps> = ({
                   </div>
                 </div>
               ) : productIdFromUrl ? (
-                <div className="bg-brand-accent/5 border border-brand-accent/10 p-6 rounded-sm">
+                <div className="bg-brand-accent/5 border border-brand-accent/10 p-6 rounded-2xl">
                   <p className="text-[10px] text-brand-accent font-bold uppercase tracking-[0.2em] mb-3">Pieza seleccionada</p>
                   <p className="text-xl font-medium text-brand-ink display-font">{selectedProduct?.name || 'Cargando producto...'}</p>
                   {selectedProduct?.sku && <p className="text-[10px] text-brand-ink/40 tracking-widest font-bold mt-2 uppercase">Ref. {selectedProduct.sku}</p>}
@@ -264,7 +264,7 @@ export const QuotePage: React.FC<QuotePageProps> = ({
                   name="specifications"
                   rows={4}
                   placeholder={items.length > 0 ? "Indique dirección o notas especiales..." : "Detalles de composición, medidas, entregas..."}
-                  className="block w-full bg-transparent border border-brand-ink/10 p-6 text-brand-ink placeholder:text-brand-ink/20 focus:border-brand-ink outline-none transition-colors text-lg font-light rounded-sm"
+                  className="block w-full bg-transparent border border-brand-ink/10 p-6 text-brand-ink placeholder:text-brand-ink/20 focus:border-brand-ink outline-none transition-colors text-lg font-light rounded-xl"
                   value={formData.specifications}
                   onChange={handleChange}
                 ></textarea>

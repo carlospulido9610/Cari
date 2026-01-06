@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, MessageCircle } from 'lucide-react';
 import { Button } from './Button';
-import { submitContactRequest } from '../services/supabaseClient';
+import { submitContactRequest } from '../src/services/supabaseClient';
 
 interface ContactSectionProps {
   onSuccess: (msg: string) => void;
@@ -55,10 +55,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onSuccess, onErr
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         <div className="mb-20 text-center opacity-0 animate-reveal" style={{ animationDelay: '0.1s' }}>
 
-          <h2 className="text-4xl md:text-6xl font-medium text-brand-ink display-font mb-4">
-            Hablemos de su <span className="font-bold text-brand-ink">visión</span>
+          <h2 className="text-4xl md:text-6xl font-medium text-brand-gold display-font mb-4">
+            Hablemos de su <span className="font-bold">visión</span>
           </h2>
-          <p className="text-brand-ink/40 font-light text-lg">Conectamos su proyecto con la excelencia técnica que su marca merece.</p>
+          <p className="text-brand-ink/40 font-medium text-lg">Conectamos su proyecto con la excelencia técnica que su marca merece.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 border border-brand-ink/5 rounded-sm overflow-hidden bg-white shadow-2xl shadow-brand-ink/5 opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
@@ -70,27 +70,27 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onSuccess, onErr
 
             <div className="relative z-10 space-y-12">
               <div>
-                <h3 className="text-[11px] uppercase tracking-[0.3em] font-bold text-brand-ivory/40 mb-8 display-font">Dirección de Enlace</h3>
+                <h3 className="text-sm uppercase tracking-wider font-semibold text-white/60 mb-8">Información de Contacto</h3>
                 <div className="space-y-10">
                   <div className="group flex items-start space-x-6">
                     <div className="w-px h-8 bg-brand-accent/30 group-hover:bg-brand-accent transition-colors"></div>
                     <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-widest font-bold text-brand-ivory/30 display-font">Canal Telefónico</p>
-                      <p className="text-xl font-light tabular-nums">+58 414 792 69 34</p>
+                      <p className="text-xs uppercase tracking-wide font-semibold text-white/50">Teléfono</p>
+                      <p className="text-lg font-semibold text-white">+58 414 792 69 34</p>
                     </div>
                   </div>
                   <div className="group flex items-start space-x-6">
                     <div className="w-px h-8 bg-brand-accent/30 group-hover:bg-brand-accent transition-colors"></div>
                     <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-widest font-bold text-brand-ivory/30 display-font">Email Corporativo</p>
-                      <p className="text-xl font-light text-brand-ink">coimpor.es@gmail.com</p>
+                      <p className="text-xs uppercase tracking-wide font-semibold text-white/50">Email</p>
+                      <p className="text-lg font-semibold text-white">coimpor.es@gmail.com</p>
                     </div>
                   </div>
                   <div className="group flex items-start space-x-6">
                     <div className="w-px h-8 bg-brand-accent/30 group-hover:bg-brand-accent transition-colors"></div>
                     <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-widest font-bold text-brand-ivory/30 display-font">Atelier / Oficinas</p>
-                      <p className="text-base font-light text-brand-ivory/60 leading-relaxed uppercase tracking-tighter">
+                      <p className="text-xs uppercase tracking-wide font-semibold text-white/50">Ubicación</p>
+                      <p className="text-base font-medium text-white/90 leading-relaxed">
                         Torre Insbanca, Avenida Urdaneta.<br />Caracas, Venezuela.
                       </p>
                     </div>
@@ -100,17 +100,17 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onSuccess, onErr
 
               {/* Enhanced WhatsApp Integration */}
               <div className="pt-12 border-t border-brand-ivory/10">
-                <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-brand-ivory/20 mb-6">Asesoría Inmediata</p>
+                <p className="text-xs uppercase tracking-wide font-semibold text-white/40 mb-6">Asesoría Inmediata</p>
                 <a
                   href="https://wa.me/584147926934"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center space-x-4 group"
                 >
-                  <div className="w-12 h-12 bg-brand-ivory/5 border border-brand-ivory/10 rounded-full flex items-center justify-center group-hover:bg-brand-accent transition-all duration-500">
-                    <MessageCircle className="w-5 h-5 text-brand-ivory" />
+                  <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center group-hover:bg-[#25D366] group-hover:border-[#25D366] transition-all duration-500">
+                    <MessageCircle className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-sm font-bold uppercase tracking-[0.2em] display-font group-hover:text-brand-accent transition-colors">WhatsApp Direct</span>
+                  <span className="text-sm font-semibold uppercase tracking-wider group-hover:text-[#25D366] transition-colors">WhatsApp</span>
                 </a>
               </div>
             </div>
@@ -121,27 +121,27 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onSuccess, onErr
             <form onSubmit={handleSubmit} className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-[10px] uppercase tracking-widest font-bold text-brand-ink/40 display-font">Nombre Completo *</label>
+                  <label htmlFor="name" className="text-xs uppercase tracking-wide font-semibold text-brand-ink/60">Nombre Completo *</label>
                   <input
                     type="text"
                     name="name"
                     id="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-transparent border-b border-brand-ink/10 py-3 text-brand-ink placeholder:text-brand-ink/20 focus:border-brand-ink outline-none transition-colors text-lg font-light"
+                    className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-brand-ink placeholder:text-brand-ink/30 focus:border-brand-ink outline-none transition-colors text-base font-medium rounded-xl"
                     placeholder="Juan Pérez"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-[10px] uppercase tracking-widest font-bold text-brand-ink/40 display-font">Email de Contacto *</label>
+                  <label htmlFor="email" className="text-xs uppercase tracking-wide font-semibold text-brand-ink/60">Email de Contacto *</label>
                   <input
                     type="email"
                     name="email"
                     id="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full bg-transparent border-b border-brand-ink/10 py-3 text-brand-ink placeholder:text-brand-ink/20 focus:border-brand-ink outline-none transition-colors text-lg font-light"
+                    className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-brand-ink placeholder:text-brand-ink/30 focus:border-brand-ink outline-none transition-colors text-base font-medium rounded-xl"
                     placeholder="empresa@correo.com"
                     required
                   />
@@ -150,40 +150,40 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onSuccess, onErr
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
                 <div className="space-y-2">
-                  <label htmlFor="phone" className="text-[10px] uppercase tracking-widest font-bold text-brand-ink/40 display-font">Teléfono</label>
+                  <label htmlFor="phone" className="text-xs uppercase tracking-wide font-semibold text-brand-ink/60">Teléfono</label>
                   <input
                     type="tel"
                     name="phone"
                     id="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full bg-transparent border-b border-brand-ink/10 py-3 text-brand-ink placeholder:text-brand-ink/20 focus:border-brand-ink outline-none transition-colors text-lg font-light tabular-nums"
+                    className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-brand-ink placeholder:text-brand-ink/30 focus:border-brand-ink outline-none transition-colors text-base font-medium tabular-nums rounded-xl"
                     placeholder="+58 (000) 000-0000"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="company" className="text-[10px] uppercase tracking-widest font-bold text-brand-ink/40 display-font">Organización</label>
+                  <label htmlFor="company" className="text-xs uppercase tracking-wide font-semibold text-brand-ink/60">Organización</label>
                   <input
                     type="text"
                     name="company"
                     id="company"
                     value={formData.company}
                     onChange={handleChange}
-                    className="w-full bg-transparent border-b border-brand-ink/10 py-3 text-brand-ink placeholder:text-brand-ink/20 focus:border-brand-ink outline-none transition-colors text-lg font-light"
+                    className="w-full bg-white border border-brand-ink/10 py-3 px-4 text-brand-ink placeholder:text-brand-ink/30 focus:border-brand-ink outline-none transition-colors text-base font-medium rounded-xl"
                     placeholder="Nombre de la marca"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="message" className="text-[10px] uppercase tracking-widest font-bold text-brand-ink/40 display-font">Mensaje / Requerimiento *</label>
+                <label htmlFor="message" className="text-xs uppercase tracking-wide font-semibold text-brand-ink/60">Mensaje / Requerimiento *</label>
                 <textarea
                   name="message"
                   id="message"
                   rows={4}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full bg-transparent border border-brand-ink/10 p-6 text-brand-ink placeholder:text-brand-ink/20 focus:border-brand-ink outline-none transition-colors text-lg font-light rounded-sm resize-none"
+                  className="w-full bg-white border border-brand-ink/10 p-6 text-brand-ink placeholder:text-brand-ink/30 focus:border-brand-ink outline-none transition-colors text-base font-medium rounded-xl resize-none"
                   placeholder="Detalles sobre su proyecto o duda específica..."
                   required
                 ></textarea>
@@ -193,7 +193,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onSuccess, onErr
                 <Button
                   type="submit"
                   isLoading={loading}
-                  className="w-full md:w-auto px-16 py-6 text-[10px] uppercase tracking-[0.5em] font-bold bg-brand-ink text-brand-ivory hover:translate-y-[-2px] transition-all shadow-2xl shadow-brand-ink/10"
+                  className="w-full md:w-auto px-12 py-4 text-sm uppercase tracking-wider font-semibold bg-brand-ink text-white hover:translate-y-[-2px] transition-all shadow-lg"
                 >
                   Confirmar Envío
                 </Button>

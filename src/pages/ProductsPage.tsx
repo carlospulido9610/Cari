@@ -4,7 +4,7 @@ import { Filter, ShoppingBag } from 'lucide-react';
 import { FilterPanel } from '../../components/FilterPanel';
 import { Button } from '../../components/Button';
 import { Product, Category } from '../../types';
-import { fetchProducts, fetchCategories } from '../../services/supabaseClient';
+import { fetchProducts, fetchCategories } from '../services/supabaseClient';
 
 export const ProductsPage: React.FC = () => {
     const navigate = useNavigate();
@@ -36,11 +36,12 @@ export const ProductsPage: React.FC = () => {
         loadData();
     }, []);
 
-    // Filter states
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
     const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const PRODUCTS_PER_PAGE = 100;
 
     // Sync URL params with state
     useEffect(() => {
@@ -79,6 +80,7 @@ export const ProductsPage: React.FC = () => {
         setSelectedCategory('all');
         setPriceRange({ min: 0, max: 1000 });
         setShowFeaturedOnly(false);
+        setCurrentPage(1);
     };
 
     // Apply filters
@@ -117,6 +119,17 @@ export const ProductsPage: React.FC = () => {
         });
     }, [products, searchQuery, selectedCategory, priceRange, showFeaturedOnly]);
 
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedCategory, priceRange, showFeaturedOnly]);
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = startIndex + PRODUCTS_PER_PAGE;
+    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
     const activeFilterCount = [
         searchQuery !== '',
         selectedCategory !== 'all',
@@ -136,10 +149,10 @@ export const ProductsPage: React.FC = () => {
                 {/* Page Header */}
                 <div className="mb-12 md:mb-20">
 
-                    <h1 className="text-4xl md:text-6xl font-medium text-brand-ink mb-4 tracking-tight display-font opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
+                    <h1 className="text-4xl md:text-6xl font-medium text-brand-gold mb-4 tracking-tight display-font opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
                         Nuestro <span className="font-bold">catálogo</span>
                     </h1>
-                    <p className="text-brand-ink/60 text-lg md:text-xl max-w-2xl font-light opacity-0 animate-reveal" style={{ animationDelay: '0.3s' }}>
+                    <p className="text-brand-ink/60 text-lg md:text-xl max-w-2xl font-medium opacity-0 animate-reveal" style={{ animationDelay: '0.3s' }}>
                         Una curaduría de insumos textiles diseñados para elevar la manufactura de piezas excepcionales.
                     </p>
                 </div>
@@ -149,7 +162,7 @@ export const ProductsPage: React.FC = () => {
                     <Button
                         variant="outline"
                         onClick={() => setIsFilterOpen(true)}
-                        className="w-full justify-between border-brand-ink/10 text-brand-ink hover:bg-brand-ink/5 px-6 py-4 rounded-xl text-sm uppercase tracking-widest font-bold"
+                        className="w-full justify-between border-brand-ink/10 text-brand-ink hover:bg-brand-ink/5 px-6 py-4 rounded-full text-sm uppercase tracking-widest font-bold"
                     >
                         <span className="flex items-center">
                             <Filter className="w-4 h-4 mr-3 stroke-[1.5px]" />
@@ -179,6 +192,7 @@ export const ProductsPage: React.FC = () => {
                                 isOpen={true}
                                 onClose={() => { }}
                             />
+
                         </div>
                     </div>
 
@@ -188,6 +202,7 @@ export const ProductsPage: React.FC = () => {
                         <div className="mb-10 flex items-center justify-between border-b border-brand-ink/5 pb-6">
                             <p className="text-[11px] uppercase tracking-widest text-brand-ink/40 font-bold">
                                 {filteredProducts.length} {filteredProducts.length === 1 ? 'resultado' : 'resultados'}
+                                {totalPages > 1 && ` · Página ${currentPage} de ${totalPages}`}
                             </p>
                             <div className="hidden md:block h-px flex-1 mx-8 bg-brand-ink/5"></div>
                         </div>
@@ -196,52 +211,79 @@ export const ProductsPage: React.FC = () => {
                             <div className="flex justify-center py-32">
                                 <div className="animate-spin rounded-full h-8 w-8 border-t-[1px] border-brand-ink"></div>
                             </div>
-                        ) : filteredProducts.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
-                                {filteredProducts.map((product, index) => (
-                                    <div
-                                        key={product.id}
-                                        className="group flex flex-col cursor-pointer"
-                                        style={{ animationDelay: `${0.6 + index * 0.05}s` }}
-                                        onClick={() => navigate(`/producto/${product.id}`)}
-                                    >
-                                        {/* Image Container with elegant frame */}
-                                        <div className="relative aspect-[4/5] overflow-hidden bg-brand-ink/[0.02] mb-6 rounded-sm">
-                                            <div className="absolute inset-0 border border-brand-ink/5 z-10 pointer-events-none group-hover:inset-3 transition-all duration-700" />
-                                            <img
-                                                src={product.image_url}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-out"
-                                                loading="lazy"
-                                            />
-                                            {product.featured && (
-                                                <div className="absolute top-4 left-4 bg-brand-ink text-brand-ivory text-[9px] uppercase tracking-[0.2em] font-bold px-3 py-1.5 z-20">
-                                                    Featured
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Content */}
-                                        <div className="flex flex-col space-y-3">
-                                            <div className="flex justify-between items-start">
-                                                <h3 className="font-medium text-brand-ink transition-colors group-hover:text-brand-accent text-lg display-font leading-tight flex-1">
-                                                    {product.name}
-                                                </h3>
-                                                <span className="text-sm font-bold text-brand-ink/40 ml-4 tabular-nums">
-                                                    ${product.price.toFixed(2)}
-                                                </span>
+                        ) : paginatedProducts.length > 0 ? (
+                            <>
+                                <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-8 sm:gap-y-16">
+                                    {paginatedProducts.map((product, index) => (
+                                        <div
+                                            key={product.id}
+                                            className="group flex flex-col cursor-pointer"
+                                            style={{ animationDelay: `${0.6 + index * 0.05}s` }}
+                                            onClick={() => navigate(`/producto/${product.id}`)}
+                                        >
+                                            {/* Image Container with elegant frame */}
+                                            <div className="relative aspect-[4/5] overflow-hidden bg-brand-ink/[0.02] mb-4 sm:mb-6 rounded-2xl">
+                                                <div className="absolute inset-0 border border-brand-ink/5 z-10 pointer-events-none group-hover:inset-3 transition-all duration-700" />
+                                                <img
+                                                    src={product.image_url}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-out"
+                                                    loading="lazy"
+                                                />
+                                                {product.featured && (
+                                                    <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-brand-ink text-brand-ivory text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-bold px-2 py-1 sm:px-3 sm:py-1.5 z-20">
+                                                        Featured
+                                                    </div>
+                                                )}
                                             </div>
-                                            <p className="text-xs uppercase tracking-widest text-brand-ink/30 font-bold group-hover:text-brand-ink/50 transition-colors">
-                                                Ver Detalles
-                                            </p>
+
+                                            {/* Content */}
+                                            <div className="flex flex-col space-y-1 sm:space-y-3">
+                                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
+                                                    <h3 className="font-medium text-brand-ink transition-colors group-hover:text-brand-accent text-sm sm:text-lg display-font leading-tight flex-1 line-clamp-2">
+                                                        {product.name}
+                                                    </h3>
+                                                    <span className="text-xs sm:text-sm font-bold text-brand-ink/40 sm:ml-4 tabular-nums mt-1 sm:mt-0">
+                                                        ${product.price.toFixed(2)}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[10px] sm:text-xs uppercase tracking-widest text-brand-ink/30 font-bold group-hover:text-brand-ink/50 transition-colors">
+                                                    Ver Detalles
+                                                </p>
+                                            </div>
                                         </div>
+                                    ))}
+                                </div>
+
+                                {/* Pagination Controls */}
+                                {totalPages > 1 && (
+                                    <div className="mt-16 flex items-center justify-center gap-4">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                            className="border-brand-ink/20 text-brand-ink hover:bg-brand-ink/5 uppercase tracking-widest text-[10px] font-bold px-6 disabled:opacity-30 disabled:cursor-not-allowed"
+                                        >
+                                            Anterior
+                                        </Button>
+                                        <span className="text-sm text-brand-ink/60 font-medium tabular-nums">
+                                            {currentPage} / {totalPages}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                            disabled={currentPage === totalPages}
+                                            className="border-brand-ink/20 text-brand-ink hover:bg-brand-ink/5 uppercase tracking-widest text-[10px] font-bold px-6 disabled:opacity-30 disabled:cursor-not-allowed"
+                                        >
+                                            Siguiente
+                                        </Button>
                                     </div>
-                                ))}
-                            </div>
+                                )}
+                            </>
                         ) : (
                             <div className="text-center py-32 bg-brand-ink/[0.01] rounded-2xl border border-brand-ink/5">
                                 <Filter className="w-10 h-10 text-brand-ink/10 mx-auto mb-6 stroke-[1px]" />
-                                <p className="text-brand-ink/40 font-light text-lg mb-8">No se encontraron productos coincidentes.</p>
+                                <p className="text-brand-ink/40 font-medium text-lg mb-8">No se encontraron productos coincidentes.</p>
                                 <Button variant="outline" size="sm" onClick={clearFilters} className="border-brand-ink/20 text-brand-ink hover:bg-brand-ink/5 uppercase tracking-widest text-[10px] font-bold px-8">
                                     Limpiar todos los filtros
                                 </Button>

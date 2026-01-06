@@ -16,19 +16,19 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
 
-  const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles = "inline-flex items-center justify-center font-bold tracking-widest uppercase transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
-    primary: "bg-[#1e3857] hover:bg-[#1e3857]/90 text-white shadow-lg shadow-[#1e3857]/20 hover:shadow-[#1e3857]/30 focus:ring-[#44b6da] border border-transparent",
-    secondary: "bg-[#44b6da] hover:bg-[#44b6da]/90 text-white shadow-md hover:shadow-xl focus:ring-[#44b6da] border border-transparent",
-    outline: "bg-transparent border-2 border-slate-200 hover:border-[#44b6da] text-slate-700 hover:text-[#44b6da] focus:ring-[#44b6da]",
-    ghost: "bg-transparent hover:bg-slate-50 text-slate-600 hover:text-[#1e3857]",
+    primary: "bg-brand-ink hover:bg-brand-ink/90 text-brand-ivory shadow-lg shadow-brand-ink/20 hover:shadow-brand-ink/30 focus:ring-brand-ink border border-transparent",
+    secondary: "bg-brand-ivory hover:bg-brand-ivory/90 text-brand-ink shadow-sm hover:shadow-md focus:ring-brand-ink border border-brand-ink/10",
+    outline: "bg-transparent border border-brand-ink/30 hover:border-brand-ink text-brand-ink hover:bg-brand-ink hover:text-brand-ivory focus:ring-brand-ink",
+    ghost: "bg-transparent hover:bg-brand-ink/5 text-brand-ink/60 hover:text-brand-ink",
   };
 
   const sizes = {
-    sm: "text-xs px-4 py-2",
-    md: "text-sm px-6 py-2.5",
-    lg: "text-base px-8 py-3",
+    sm: "text-[10px] px-5 py-2.5",
+    md: "text-[11px] px-7 py-3.5",
+    lg: "text-xs px-10 py-4",
   };
 
   return (
