@@ -731,7 +731,21 @@ export const AdminDashboard: React.FC = () => {
                                                 return (
                                                     <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                                                         <td className="p-4">
-                                                            <img src={product.image_url} alt="" className="w-10 h-10 rounded object-cover bg-slate-200" />
+                                                            <div className="relative group/img">
+                                                                <img src={product.image_url} alt="" className="w-10 h-10 rounded object-cover bg-slate-200 cursor-pointer" />
+                                                                {/* Hover Preview Tooltip */}
+                                                                {product.image_url && (
+                                                                    <div className="absolute left-12 top-0 z-50 hidden group-hover/img:block">
+                                                                        <div className="bg-white p-2 rounded-lg shadow-2xl border border-slate-200">
+                                                                            <img
+                                                                                src={product.image_url}
+                                                                                alt={product.name}
+                                                                                className="w-48 h-48 object-cover rounded"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </td>
                                                         <td className="p-4 font-mono text-xs text-slate-500">
                                                             {product.sku || '-'}
