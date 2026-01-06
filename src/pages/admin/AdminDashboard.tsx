@@ -733,15 +733,16 @@ export const AdminDashboard: React.FC = () => {
                                                         <td className="p-4">
                                                             <div className="relative group/img">
                                                                 <img src={product.image_url} alt="" className="w-10 h-10 rounded object-cover bg-slate-200 cursor-pointer" />
-                                                                {/* Hover Preview Tooltip */}
+                                                                {/* Hover Preview Tooltip - uses fixed to escape overflow */}
                                                                 {product.image_url && (
-                                                                    <div className="absolute left-12 top-0 z-50 hidden group-hover/img:block">
-                                                                        <div className="bg-white p-2 rounded-lg shadow-2xl border border-slate-200">
+                                                                    <div className="fixed left-[180px] mt-[-40px] z-[9999] hidden group-hover/img:block pointer-events-none">
+                                                                        <div className="bg-white p-2 rounded-lg shadow-2xl border border-slate-300 ring-1 ring-black/5">
                                                                             <img
                                                                                 src={product.image_url}
                                                                                 alt={product.name}
-                                                                                className="w-48 h-48 object-cover rounded"
+                                                                                className="w-52 h-52 object-cover rounded"
                                                                             />
+                                                                            <p className="text-xs text-slate-500 mt-1 text-center truncate max-w-[208px]">{product.name}</p>
                                                                         </div>
                                                                     </div>
                                                                 )}
