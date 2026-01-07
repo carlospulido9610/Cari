@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
+import { AnnouncementBar } from './components/AnnouncementBar';
 import { Hero } from './components/Hero';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
@@ -49,7 +50,12 @@ function AppLayout() {
   return (
     <div className="min-h-screen flex flex-col font-sans text-brand-ink bg-brand-ivory overflow-x-hidden w-full relative">
       <CartDrawer />
-      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && (
+        <div className="sticky top-0 z-50">
+          <AnnouncementBar />
+          <Navbar />
+        </div>
+      )}
 
       <main className="flex-grow">
         <Routes>

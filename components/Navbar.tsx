@@ -77,9 +77,9 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav className="sticky top-2 md:top-6 z-50 flex justify-center px-2 md:px-6 transition-all duration-500 w-full pointer-events-none">
-      <div className={`pointer-events-auto relative z-50 w-full max-w-7xl bg-brand-ivory/70 backdrop-blur-2xl rounded-2xl shadow-[0_4px_24px_rgba(15,23,42,0.04)] border border-brand-ink/5 px-3 md:px-8 py-4 md:py-5 transition-all duration-500 ${scrolled ? 'py-3 md:py-3.5 bg-brand-ivory/90 shadow-[0_8px_32px_rgba(15,23,42,0.08)]' : 'py-4 md:py-5'}`}>
-        <div className="flex justify-between items-center relative">
+    <nav className="relative z-50 w-full transition-all duration-500">
+      <div className={`w-full bg-brand-ivory/95 backdrop-blur-2xl border-b border-brand-ink/5 px-4 md:px-12 py-3 md:py-4 transition-all duration-500 shadow-sm`}>
+        <div className="max-w-7xl mx-auto flex justify-between items-center relative">
 
           {/* Logo */}
           <Link to="/" className="flex-shrink-0 flex items-center cursor-pointer group pr-10">
@@ -173,7 +173,7 @@ export const Navbar: React.FC = () => {
             </button>
           </div>
         </div>
-      </div >
+      </div>
 
 
 

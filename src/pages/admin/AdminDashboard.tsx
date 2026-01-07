@@ -70,6 +70,11 @@ export const AdminDashboard: React.FC = () => {
     // Hover Image Preview State
     const [hoverImage, setHoverImage] = useState<{ url: string; name: string; x: number; y: number } | null>(null);
 
+    // Bulk Edit State
+    const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
+    const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
+    const [bulkEditData, setBulkEditData] = useState<{ category_id?: string; price?: number }>({});
+
 
     useEffect(() => {
         loadData();
@@ -88,6 +93,51 @@ export const AdminDashboard: React.FC = () => {
         setContacts(con);
         setQuotes(quo);
         setLoading(false);
+        // Reset selection on reload
+        setSelectedProductIds(new Set());
+    };
+
+    const toggleProductSelection = (id: string) => {
+        const newSelection = new Set(selectedProductIds);
+        if (newSelection.has(id)) {
+            newSelection.delete(id);
+        } else {
+            newSelection.add(id);
+        }
+        setSelectedProductIds(newSelection);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedProductIds.size === filteredProducts.length && filteredProducts.length > 0) {
+            setSelectedProductIds(new Set());
+        } else {
+            setSelectedProductIds(new Set(filteredProducts.map(p => p.id)));
+        }
+    };
+
+    const handleBulkUpdate = async () => {
+        if (selectedProductIds.size === 0) return;
+
+        setIsUploading(true);
+        try {
+            const updates = Array.from(selectedProductIds).map(id => {
+                const data: Partial<Product> = {};
+                if (bulkEditData.category_id) data.category_id = bulkEditData.category_id;
+                if (bulkEditData.price !== undefined) data.price = bulkEditData.price;
+                return updateProduct(id, data);
+            });
+
+            await Promise.all(updates);
+            alert('Productos actualizados correctamente');
+            setIsBulkEditModalOpen(false);
+            setBulkEditData({});
+            loadData();
+        } catch (error) {
+            console.error('Error in bulk update:', error);
+            alert('Error al actualizar los productos');
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     const handleLogout = () => {
@@ -685,6 +735,20 @@ export const AdminDashboard: React.FC = () => {
                             <h2 className="text-2xl font-bold text-slate-800">Gestión de Productos</h2>
 
                             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                {selectedProductIds.size > 0 && (
+                                    <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+                                        <span className="text-sm font-medium text-blue-700">
+                                            {selectedProductIds.size} seleccionados
+                                        </span>
+                                        <Button
+                                            size="sm"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                                            onClick={() => setIsBulkEditModalOpen(true)}
+                                        >
+                                            Editar Masivo
+                                        </Button>
+                                    </div>
+                                )}
                                 {/* Search Bar */}
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -725,6 +789,14 @@ export const AdminDashboard: React.FC = () => {
                                 <table className="w-full text-left text-sm">
                                     <thead className="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
                                         <tr>
+                                            <th className="p-4 w-10">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                    checked={filteredProducts.length > 0 && selectedProductIds.size === filteredProducts.length}
+                                                    onChange={toggleSelectAll}
+                                                />
+                                            </th>
                                             <th className="p-4">Imagen</th>
                                             <th className="p-4">SKU</th>
                                             <th className="p-4">Nombre</th>
@@ -740,7 +812,7 @@ export const AdminDashboard: React.FC = () => {
                                     <tbody className="divide-y divide-slate-100">
                                         {filteredProducts.length === 0 ? (
                                             <tr>
-                                                <td colSpan={9} className="p-8 text-center text-slate-500">
+                                                <td colSpan={10} className="p-8 text-center text-slate-500">
                                                     No se encontraron productos que coincidan con tu búsqueda.
                                                 </td>
                                             </tr>
@@ -749,7 +821,15 @@ export const AdminDashboard: React.FC = () => {
                                                 const catName = categories.find(c => c.id === product.category_id)?.name || product.category_id;
                                                 const hasVars = product.colors && product.colors.length > 0;
                                                 return (
-                                                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                                                    <tr key={product.id} className={`hover:bg-slate-50 transition-colors ${selectedProductIds.has(product.id) ? 'bg-blue-50/50' : ''}`}>
+                                                        <td className="p-4">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                                checked={selectedProductIds.has(product.id)}
+                                                                onChange={() => toggleProductSelection(product.id)}
+                                                            />
+                                                        </td>
                                                         <td className="p-4">
                                                             <div
                                                                 className="relative"
@@ -2065,6 +2145,70 @@ export const AdminDashboard: React.FC = () => {
                                 <Button type="submit">Guardar Categoría</Button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* BULK EDIT MODAL */}
+            {isBulkEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                            <h3 className="text-xl font-bold">Edición Masiva</h3>
+                            <button onClick={() => setIsBulkEditModalOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Cerrar modal">
+                                <XCircle className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4">
+                                <p className="text-sm text-blue-800">
+                                    Estás editando <span className="font-bold">{selectedProductIds.size}</span> productos seleccionados.
+                                </p>
+                                <p className="text-xs text-blue-600 mt-1">
+                                    Solo se actualizarán los campos que modifiques a continuación.
+                                </p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Categoría (Opcional)</label>
+                                    <select
+                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        value={bulkEditData.category_id || ''}
+                                        onChange={e => setBulkEditData({ ...bulkEditData, category_id: e.target.value })}
+                                    >
+                                        <option value="">Mantener original</option>
+                                        {categories.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nuevo Precio (Opcional)</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        placeholder="Mantener original"
+                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        value={bulkEditData.price ?? ''}
+                                        onChange={e => setBulkEditData({ ...bulkEditData, price: parseNumberInput(e.target.value) })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="pt-4 flex justify-end gap-3">
+                                <Button type="button" variant="ghost" onClick={() => setIsBulkEditModalOpen(false)}>Cancelar</Button>
+                                <Button
+                                    type="button"
+                                    onClick={handleBulkUpdate}
+                                    disabled={isUploading || (!bulkEditData.category_id && bulkEditData.price === undefined)}
+                                >
+                                    {isUploading ? 'Actualizando...' : 'Aplicar a Todos'}
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
