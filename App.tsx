@@ -19,6 +19,7 @@ import { ToastMessage } from './types';
 import { CartProvider } from './src/context/CartContext';
 import { CartDrawer } from './src/components/CartDrawer';
 import { ProtectedRoute } from './src/components/ProtectedRoute';
+import { WhatsAppButton } from './src/components/WhatsAppButton';
 
 function HomePage() {
   return (
@@ -110,6 +111,8 @@ function AppLayout() {
           ))}
         </div>
       </div>
+
+      {!isAdminRoute && <WhatsAppButton />}
     </div>
   );
 }
