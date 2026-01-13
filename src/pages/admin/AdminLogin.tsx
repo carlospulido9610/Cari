@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { signIn } from '../../services/supabaseClient';
 import { Button } from '../../../components/Button';
-import { Lock } from 'lucide-react';
+import { Lock, Mail, Key } from 'lucide-react';
 
 export const AdminLogin: React.FC = () => {
-    const [key, setKey] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simple client-side hardcoded key for demonstration. 
-        // In production, use Supabase Auth or Environment Variables.
-        if (key === 'admin123' || key === import.meta.env.VITE_ADMIN_KEY) {
+        setLoading(true);
+        setError('');
+
+        try {
+            await signIn(email, password);
             localStorage.setItem('admin_auth', 'true');
             navigate('/admin/dashboard');
-        } else {
-            setError('Clave incorrecta');
+        } catch (err: any) {
+            console.error('Login error:', err);
+            setError('Credenciales inválidas. Verifica tu correo y contraseña.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -33,15 +41,32 @@ export const AdminLogin: React.FC = () => {
                         </div>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-8">
+                    <form onSubmit={handleLogin} className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-[9px] uppercase tracking-widest font-bold text-brand-ink/30 ml-1">Clave de Enlace</label>
+                            <label className="text-[9px] uppercase tracking-widest font-bold text-brand-ink/30 ml-1 flex items-center gap-2">
+                                <Mail className="w-3 h-3" /> Correo Electrónico
+                            </label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="admin@cari.com"
+                                className="w-full bg-brand-ivory/50 border-b border-brand-ink/10 py-3 px-1 text-base focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/10"
+                                required
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[9px] uppercase tracking-widest font-bold text-brand-ink/30 ml-1 flex items-center gap-2">
+                                <Key className="w-3 h-3" /> Contraseña
+                            </label>
                             <input
                                 type="password"
-                                value={key}
-                                onChange={(e) => setKey(e.target.value)}
-                                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                                className="w-full bg-brand-ivory/50 border-b border-brand-ink/10 py-4 px-1 text-center text-lg focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/10 tracking-[0.5em]"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                className="w-full bg-brand-ivory/50 border-b border-brand-ink/10 py-3 px-1 text-base focus:border-brand-ink outline-none transition-colors placeholder:text-brand-ink/10 tracking-widest"
+                                required
                             />
                         </div>
 
@@ -53,9 +78,10 @@ export const AdminLogin: React.FC = () => {
 
                         <button
                             type="submit"
-                            className="w-full py-5 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.5em] font-bold hover:bg-brand-ink/90 transition-all shadow-xl shadow-brand-ink/10"
+                            disabled={loading}
+                            className={`w-full py-4 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-brand-ink/90 transition-all shadow-xl shadow-brand-ink/10 flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
-                            Verificar Identidad
+                            {loading ? 'Verificando...' : 'Iniciar Sesión'}
                         </button>
                     </form>
                 </div>

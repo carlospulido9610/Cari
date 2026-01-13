@@ -1,22 +1,20 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Category, Product, ContactRequest, QuoteRequest, ContactEntry, QuoteEntry } from '../../types';
-import { productCategories } from '../../data/productCategories';
+import { Category, Product, ContactRequest, QuoteRequest, ContactEntry, QuoteEntry } from '../types';
+import { productCategories } from '../data/productCategories';
 
 // NOTE: Ideally, these would be in a .env file.
 // If not provided, the app will fall back to mock data for demonstration.
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-export let supabase: SupabaseClient | null = null;
+let supabase: SupabaseClient | null = null;
 
 if (SUPABASE_URL && SUPABASE_KEY) {
   console.log('[Supabase] Initializing client with URL:', SUPABASE_URL);
   supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 } else {
-  console.warn('[Supabase] Credentials not found in environment variables.');
-  console.warn('VITE_SUPABASE_URL:', SUPABASE_URL ? 'Found' : 'Missing');
-  console.warn('VITE_SUPABASE_ANON_KEY:', SUPABASE_KEY ? 'Found' : 'Missing');
-  console.warn('Falling back to mock data.');
+  console.warn('[Supabase] Credentials not found. URL exists?', !!SUPABASE_URL, 'Key exists?', !!SUPABASE_KEY);
+  console.warn('Using mock data.');
 }
 
 // --- Mock Data for Demo Purposes ---
@@ -238,15 +236,12 @@ export const deleteProduct = async (id: string): Promise<boolean> => {
     return true;
   }
 
-  // Log session for debugging
-  const { data: sessionData } = await supabase.auth.getSession();
-  console.log('[deleteProduct] Current session:', sessionData?.session?.user?.email || 'NO SESSION');
-
   console.log('[deleteProduct] Attempting Supabase delete for id:', id);
-  const { error } = await supabase.from('products').delete().eq('id', id);
+  const { error, count } = await supabase.from('products').delete().eq('id', id);
 
   if (error) {
     console.error('[deleteProduct] Supabase error:', error);
+    // Explicitly return the error message for the UI to show
     (window as any).lastSupabaseError = error;
     return false;
   }
@@ -496,31 +491,4 @@ export const updateQuote = async (id: string, updates: Partial<QuoteEntry>): Pro
     return false;
   }
   return true;
-};
-
-// --- Auth Helper ---
-
-export const signIn = async (email: string, password: string) => {
-  if (!supabase) throw new Error('Supabase client not initialized');
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  if (error) throw error;
-  return data;
-};
-
-export const signOut = async () => {
-  if (!supabase) return;
-  await supabase.auth.signOut();
-};
-
-export const getSession = async () => {
-  if (!supabase) return null;
-  const { data, error } = await supabase.auth.getSession();
-  if (error) {
-    console.error('[getSession] Error:', error);
-    return null;
-  }
-  return data.session;
 };

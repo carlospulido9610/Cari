@@ -4,11 +4,11 @@ import {
     fetchProducts, createProduct, updateProduct, deleteProduct,
     fetchCategories, createCategory, updateCategory, deleteCategory,
     uploadProductImage, fetchContacts, fetchQuotes, deleteContact, deleteQuote,
-    updateContact, updateQuote, fetchProductById
+    updateContact, updateQuote, fetchProductById, signOut
 } from '../../services/supabaseClient';
 import { Product, Category, ProductVariant, ContactEntry, QuoteEntry } from '../../../types';
 import { Button } from '../../../components/Button';
-import { Plus, Edit, Trash2, LogOut, CheckCircle, XCircle, Upload, Folder, Package, Search, Filter, MessageSquare, FileText, Scissors } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, CheckCircle, XCircle, Upload, Folder, Package, Search, Filter, MessageSquare, FileText, Scissors, ChevronUp, ChevronDown, ArrowUpDown } from 'lucide-react';
 
 type TabType = 'products' | 'categories' | 'contacts' | 'quotes' | 'service_quotes';
 
@@ -34,6 +34,8 @@ export const AdminDashboard: React.FC = () => {
     // Search & Filter State
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState<string>('all');
+    const [sortField, setSortField] = useState<'category' | 'price' | 'stock' | 'name' | 'active'>('name');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
     // Product Form State
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -120,7 +122,7 @@ export const AdminDashboard: React.FC = () => {
 
         setIsUploading(true);
         try {
-            const updates = Array.from(selectedProductIds).map(id => {
+            const updates = Array.from(selectedProductIds).map((id: string) => {
                 const data: Partial<Product> = {};
                 if (bulkEditData.category_id) data.category_id = bulkEditData.category_id;
                 if (bulkEditData.price !== undefined) data.price = bulkEditData.price;
@@ -140,14 +142,27 @@ export const AdminDashboard: React.FC = () => {
         }
     };
 
-    const handleLogout = () => {
-        alert('Cerrando sesión...'); // TEST: Si ves este alert, el botón funciona
+    const handleLogout = async () => {
         console.log('🔴 handleLogout called');
-        console.log('🔴 Removing admin_auth from localStorage');
+        await signOut();
         localStorage.removeItem('admin_auth');
-        console.log('🔴 admin_auth removed, navigating to /admin');
         navigate('/admin');
-        console.log('🔴 navigate called');
+    };
+
+    const handleSort = (field: 'category' | 'price' | 'stock' | 'name' | 'active') => {
+        if (sortField === field) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortOrder('asc');
+        }
+    };
+
+    const SortIcon = ({ field }: { field: 'category' | 'price' | 'stock' | 'name' | 'active' }) => {
+        if (sortField !== field) return <ArrowUpDown className="w-3 h-3 ml-1 text-slate-400" />;
+        return sortOrder === 'asc'
+            ? <ChevronUp className="w-3 h-3 ml-1 text-blue-600" />
+            : <ChevronDown className="w-3 h-3 ml-1 text-blue-600" />;
     };
 
     // ===== PRODUCT MANAGEMENT =====
@@ -631,13 +646,28 @@ export const AdminDashboard: React.FC = () => {
             return matchesSearch && matchesCategory;
         })
         .sort((a, b) => {
-            // Sort by Category Name first
-            const catA = categories.find(c => c.id === a.category_id)?.name || '';
-            const catB = categories.find(c => c.id === b.category_id)?.name || '';
-            const catCompare = catA.localeCompare(catB);
-            if (catCompare !== 0) return catCompare;
-            // Then by Product Name
-            return a.name.localeCompare(b.name);
+            let comparison = 0;
+            switch (sortField) {
+                case 'category':
+                    const catA = categories.find(c => c.id === a.category_id)?.name || '';
+                    const catB = categories.find(c => c.id === b.category_id)?.name || '';
+                    comparison = catA.localeCompare(catB);
+                    break;
+                case 'price':
+                    comparison = (a.price || 0) - (b.price || 0);
+                    break;
+                case 'stock':
+                    comparison = (a.stock || 0) - (b.stock || 0);
+                    break;
+                case 'active':
+                    comparison = (a.active === b.active) ? 0 : (a.active ? -1 : 1);
+                    break;
+                case 'name':
+                default:
+                    comparison = a.name.localeCompare(b.name);
+                    break;
+            }
+            return sortOrder === 'asc' ? comparison : -comparison;
         });
 
     return (
@@ -799,11 +829,21 @@ export const AdminDashboard: React.FC = () => {
                                             </th>
                                             <th className="p-4">Imagen</th>
                                             <th className="p-4">SKU</th>
-                                            <th className="p-4">Nombre</th>
-                                            <th className="p-4">Categoría</th>
-                                            <th className="p-4">Precio</th>
-                                            <th className="p-4">Stock</th>
-                                            <th className="p-4 text-center">Estado</th>
+                                            <th className="p-4 cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => handleSort('name')}>
+                                                <div className="flex items-center">Nombre <SortIcon field="name" /></div>
+                                            </th>
+                                            <th className="p-4 cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => handleSort('category')}>
+                                                <div className="flex items-center">Categoría <SortIcon field="category" /></div>
+                                            </th>
+                                            <th className="p-4 cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => handleSort('price')}>
+                                                <div className="flex items-center">Precio <SortIcon field="price" /></div>
+                                            </th>
+                                            <th className="p-4 cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => handleSort('stock')}>
+                                                <div className="flex items-center">Stock <SortIcon field="stock" /></div>
+                                            </th>
+                                            <th className="p-4 text-center cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => handleSort('active')}>
+                                                <div className="flex items-center justify-center">Estado <SortIcon field="active" /></div>
+                                            </th>
                                             <th className="p-4 text-center">Colores</th>
                                             <th className="p-4 text-center">Destacado</th>
                                             <th className="p-4 text-right">Acciones</th>
