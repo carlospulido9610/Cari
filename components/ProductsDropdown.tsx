@@ -44,7 +44,7 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
             <div className="border-b border-brand-ink/5">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="w-full flex items-center justify-between px-3 py-4 text-[10px] uppercase tracking-[0.3em] font-bold text-brand-ink/60 hover:text-brand-ink transition-colors display-font"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-lg font-medium uppercase tracking-widest text-brand-ink/80 hover:text-brand-ink hover:bg-brand-ink/5 transition-all display-font"
                 >
                     <span>Catálogo</span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-500 ${isOpen ? 'rotate-180' : ''}`} />
@@ -83,7 +83,7 @@ export const ProductsDropdown: React.FC<ProductsDropdownProps> = ({
             onMouseLeave={() => setIsOpen(false)}
         >
             <button
-                className={`flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold transition-all display-font ${isOpen ? 'text-brand-ink' : 'text-brand-ink/60 hover:text-brand-ink'}`}
+                className={`flex items-center gap-1 text-[13px] uppercase tracking-widest font-medium transition-all display-font ${isOpen ? 'text-brand-ink' : 'text-brand-ink/70 hover:text-brand-ink'}`}
                 aria-expanded={isOpen}
             >
                 Catálogo
