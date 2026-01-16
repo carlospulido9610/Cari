@@ -75,7 +75,7 @@ export const AdminDashboard: React.FC = () => {
     // Bulk Edit State
     const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
-    const [bulkEditData, setBulkEditData] = useState<{ category_id?: string; price?: number }>({});
+    const [bulkEditData, setBulkEditData] = useState<{ category_id?: string; price?: number; hardware_color?: 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | '' }>({});
 
 
     useEffect(() => {
@@ -126,6 +126,7 @@ export const AdminDashboard: React.FC = () => {
                 const data: Partial<Product> = {};
                 if (bulkEditData.category_id) data.category_id = bulkEditData.category_id;
                 if (bulkEditData.price !== undefined) data.price = bulkEditData.price;
+                if (bulkEditData.hardware_color) data.hardware_color = bulkEditData.hardware_color;
                 return updateProduct(id, data);
             });
 
@@ -1542,6 +1543,33 @@ export const AdminDashboard: React.FC = () => {
                                     </select>
                                 </div>
 
+                                {/* Hardware Color Selector - Only for Herrajes category */}
+                                {(() => {
+                                    const selectedCat = categories.find(c => c.id === formData.category_id);
+                                    const isHerrajesCategory = selectedCat?.slug === 'herrajes' ||
+                                        categories.find(c => c.id === selectedCat?.parent_id)?.slug === 'herrajes';
+
+                                    if (!isHerrajesCategory) return null;
+
+                                    return (
+                                        <div>
+                                            <label htmlFor="hardware_color" className="block text-sm font-medium text-slate-700 mb-1">Color de Herraje</label>
+                                            <select
+                                                id="hardware_color"
+                                                className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                value={formData.hardware_color || ''}
+                                                onChange={e => setFormData({ ...formData, hardware_color: e.target.value as 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | undefined })}
+                                            >
+                                                <option value="">Sin especificar</option>
+                                                <option value="Dorado">Dorado</option>
+                                                <option value="Plata">Plata</option>
+                                                <option value="GoldenRose">GoldenRose</option>
+                                                <option value="Otros">Otros</option>
+                                            </select>
+                                        </div>
+                                    );
+                                })()}
+
                                 {/* NEW FIELDS: Quantity & Customization */}
                                 <div className="col-span-2 grid grid-cols-1 gap-6 bg-slate-50 p-6 rounded-xl border border-slate-100">
                                     <div className="space-y-3">
@@ -2236,6 +2264,22 @@ export const AdminDashboard: React.FC = () => {
                                         onChange={e => setBulkEditData({ ...bulkEditData, price: parseNumberInput(e.target.value) })}
                                     />
                                 </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Color de Herraje (Opcional)</label>
+                                    <select
+                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        value={bulkEditData.hardware_color || ''}
+                                        onChange={e => setBulkEditData({ ...bulkEditData, hardware_color: e.target.value as 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | '' })}
+                                    >
+                                        <option value="">Mantener original</option>
+                                        <option value="Dorado">Dorado</option>
+                                        <option value="Plata">Plata</option>
+                                        <option value="GoldenRose">GoldenRose</option>
+                                        <option value="Otros">Otros</option>
+                                    </select>
+                                    <p className="text-xs text-slate-400 mt-1">Solo aplica para productos de herrajes.</p>
+                                </div>
                             </div>
 
                             <div className="pt-4 flex justify-end gap-3">
@@ -2243,7 +2287,7 @@ export const AdminDashboard: React.FC = () => {
                                 <Button
                                     type="button"
                                     onClick={handleBulkUpdate}
-                                    disabled={isUploading || (!bulkEditData.category_id && bulkEditData.price === undefined)}
+                                    disabled={isUploading || (!bulkEditData.category_id && bulkEditData.price === undefined && !bulkEditData.hardware_color)}
                                 >
                                     {isUploading ? 'Actualizando...' : 'Aplicar a Todos'}
                                 </Button>

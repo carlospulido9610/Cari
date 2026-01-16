@@ -14,6 +14,10 @@ interface FilterPanelProps {
     onClearFilters: () => void;
     isOpen: boolean;
     onClose: () => void;
+    // Hardware color filter props
+    isHerrajesSelected?: boolean;
+    selectedHardwareColor?: string;
+    onHardwareColorChange?: (color: string) => void;
 }
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({
@@ -26,7 +30,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     onFeaturedToggle,
     onClearFilters,
     isOpen,
-    onClose
+    onClose,
+    isHerrajesSelected,
+    selectedHardwareColor,
+    onHardwareColorChange
 }) => {
     // Collapsible states for sections
     const [isCategoryOpen, setIsCategoryOpen] = useState(true);
@@ -206,6 +213,40 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                             </div>
                         )}
                     </div>
+
+                    {/* Hardware Color Filter - Only shows when Herrajes is selected */}
+                    {isHerrajesSelected && onHardwareColorChange && (
+                        <div className="border-b border-slate-100 pb-6 mb-6">
+                            <h4 className="text-sm font-bold text-slate-900 mb-4">Color de Herraje</h4>
+                            <div className="space-y-2">
+                                {['all', 'Dorado', 'Plata', 'GoldenRose', 'Otros'].map(color => (
+                                    <label key={color} className="flex items-center gap-3 cursor-pointer group">
+                                        <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedHardwareColor === color || (color === 'all' && !selectedHardwareColor)
+                                                ? 'bg-[#44b6da] border-[#44b6da]'
+                                                : 'border-slate-300 group-hover:border-[#44b6da]'
+                                            }`}>
+                                            {(selectedHardwareColor === color || (color === 'all' && !selectedHardwareColor)) && (
+                                                <CheckIcon className="w-3.5 h-3.5 text-white" />
+                                            )}
+                                        </div>
+                                        <span className={`text-sm ${selectedHardwareColor === color || (color === 'all' && !selectedHardwareColor)
+                                                ? 'text-slate-900 font-medium'
+                                                : 'text-slate-600'
+                                            }`}>
+                                            {color === 'all' ? 'Todos los colores' : color}
+                                        </span>
+                                        <input
+                                            type="radio"
+                                            name="hardwareColor"
+                                            className="hidden"
+                                            checked={selectedHardwareColor === color || (color === 'all' && !selectedHardwareColor)}
+                                            onChange={() => onHardwareColorChange(color === 'all' ? '' : color)}
+                                        />
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Featured/Other Filters */}
                     <div>

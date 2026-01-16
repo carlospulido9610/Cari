@@ -40,8 +40,19 @@ export const ProductsPage: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
     const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+    const [selectedHardwareColor, setSelectedHardwareColor] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const PRODUCTS_PER_PAGE = 100;
+
+    // Check if Herrajes category is selected (for showing color filter)
+    const isHerrajesSelected = useMemo(() => {
+        if (selectedCategory === 'all') return false;
+        const selectedCat = categories.find(c => c.id === selectedCategory);
+        if (!selectedCat) return false;
+        // Direct match or subcategory of herrajes
+        return selectedCat.slug === 'herrajes' ||
+            categories.find(c => c.id === selectedCat.parent_id)?.slug === 'herrajes';
+    }, [selectedCategory, categories]);
 
     // Sync URL params with state
     useEffect(() => {
@@ -80,6 +91,7 @@ export const ProductsPage: React.FC = () => {
         setSelectedCategory('all');
         setPriceRange({ min: 0, max: 1000 });
         setShowFeaturedOnly(false);
+        setSelectedHardwareColor('');
         setCurrentPage(1);
     };
 
@@ -99,13 +111,13 @@ export const ProductsPage: React.FC = () => {
                 if (!productCategory) return false;
 
                 // 1. Direct match (product belongs to selected category)
-                if (product.category_id === selectedCategory) return true;
+                const directMatch = product.category_id === selectedCategory;
 
                 // 2. Parent match (product belongs to a subcategory of selected parent)
                 // If selectedCategory is a parent, we need to check if productCategory.parent_id === selectedCategory
-                if (productCategory.parent_id === selectedCategory) return true;
+                const parentMatch = productCategory.parent_id === selectedCategory;
 
-                return false;
+                if (!directMatch && !parentMatch) return false;
             }
             // Price range filter
             if (product.price < priceRange.min || product.price > priceRange.max) {
@@ -115,9 +127,15 @@ export const ProductsPage: React.FC = () => {
             if (showFeaturedOnly && !product.featured) {
                 return false;
             }
+            // Hardware color filter (only applies when Herrajes is selected)
+            if (selectedHardwareColor && isHerrajesSelected) {
+                if (product.hardware_color !== selectedHardwareColor) {
+                    return false;
+                }
+            }
             return true;
         });
-    }, [products, searchQuery, selectedCategory, priceRange, showFeaturedOnly]);
+    }, [products, searchQuery, selectedCategory, priceRange, showFeaturedOnly, selectedHardwareColor, isHerrajesSelected, categories]);
 
     // Reset page when filters change
     useEffect(() => {
@@ -191,6 +209,9 @@ export const ProductsPage: React.FC = () => {
                                 onClearFilters={clearFilters}
                                 isOpen={true}
                                 onClose={() => { }}
+                                isHerrajesSelected={isHerrajesSelected}
+                                selectedHardwareColor={selectedHardwareColor}
+                                onHardwareColorChange={setSelectedHardwareColor}
                             />
 
                         </div>
@@ -308,6 +329,9 @@ export const ProductsPage: React.FC = () => {
                     onClearFilters={clearFilters}
                     isOpen={isFilterOpen}
                     onClose={() => setIsFilterOpen(false)}
+                    isHerrajesSelected={isHerrajesSelected}
+                    selectedHardwareColor={selectedHardwareColor}
+                    onHardwareColorChange={setSelectedHardwareColor}
                 />
             </div>
         </div>

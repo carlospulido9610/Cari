@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Product, ProductVariant, Category } from '../../types';
 import { fetchProductById, fetchProducts, fetchCategories } from '../services/supabaseClient';
 import { Button } from '../../components/Button';
-import { ArrowLeft, ShoppingBag, Truck, ShieldCheck, Phone, Check, AlertCircle } from 'lucide-react';
+import { Star, Truck, Shield, ArrowRight, Share2, Minus, Plus, ShoppingBag, ArrowLeft, ShieldCheck, Phone, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 interface ProductDetailsPageProps { }
@@ -159,31 +160,47 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
     const hasVariants = product.has_variants && product.variants && product.variants.length > 0;
 
     return (
-        <div className="min-h-screen bg-brand-ivory pt-32 pb-20 md:pt-48 md:pb-32 relative overflow-hidden">
+        <div className="min-h-screen bg-brand-ivory pt-4 pb-12 md:pt-28 md:pb-32 relative overflow-hidden">
             {/* Minimal Background Geometry */}
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-0 right-0 w-px h-full bg-brand-ink/5" />
                 <div className="absolute bottom-1/4 left-0 w-full h-px bg-brand-ink/5" />
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-12 relative z-10">
 
                 {/* Breadcrumb / Back */}
 
 
                 <div className="bg-transparent overflow-hidden">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24">
+                    {/* Mobile Back Button - Float above content */}
+                    <div className="md:hidden mb-4 pl-1">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="inline-flex items-center gap-2 text-brand-ink/60 hover:text-brand-ink transition-colors"
+                        >
+                            <div className="p-2 bg-white rounded-full shadow-sm border border-brand-ink/5">
+                                <ArrowLeft className="w-5 h-5" />
+                            </div>
+                            <span className="text-xs font-medium uppercase tracking-widest">Volver</span>
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-24">
 
                         {/* Image Section - Hero Scale */}
-                        <div className="lg:col-span-7 space-y-8 opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
-                            <div className="relative aspect-[4/5] bg-brand-ink/[0.02] overflow-hidden rounded-2xl border border-brand-ink/5">
+                        <div className="lg:col-span-7 space-y-3 md:space-y-8 opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
+                            <div className="w-full aspect-square md:aspect-[4/5] bg-brand-ink/[0.02] overflow-hidden rounded-xl md:rounded-2xl border border-brand-ink/5">
+                                {/* Mobile Back Button */}
+
+
                                 <img
                                     src={displayImage}
                                     alt={product.name}
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
                                 />
                                 {product.featured && (
-                                    <div className="absolute top-8 left-8 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.3em] font-bold px-4 py-2 z-10">
+                                    <div className="absolute top-4 right-4 md:top-8 md:left-8 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.3em] font-bold px-4 py-2 z-10 transition-all duration-300">
                                         Exclusivo
                                     </div>
                                 )}
@@ -194,16 +211,16 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                 const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
                                 if (allImages.length > 1) {
                                     return (
-                                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                                        <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2 md:pb-4 scrollbar-hide">
                                             {allImages.map((img, idx) => (
                                                 <button
                                                     key={idx}
                                                     onClick={() => setDisplayImage(img)}
-                                                    className={`flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden border transition-all ${displayImage === img ? 'border-brand-ink' : 'border-brand-ink/5 hover:border-brand-ink/20 opacity-60 hover:opacity-100'}`}
+                                                    className={`flex - shrink - 0 w - 16 h - 16 md: w - 24 md: h - 24 rounded - xl md: rounded - 2xl overflow - hidden border transition - all ${displayImage === img ? 'border-brand-ink' : 'border-brand-ink/5 hover:border-brand-ink/20 opacity-60 hover:opacity-100'} `}
                                                 >
                                                     <img
                                                         src={img}
-                                                        alt={`${product.name} ${idx + 1}`}
+                                                        alt={`${product.name} ${idx + 1} `}
                                                         className="w-full h-full object-cover bg-brand-ivory"
                                                     />
                                                 </button>
@@ -217,11 +234,11 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
 
                         {/* Info Section - Editorial Detail */}
                         <div className="lg:col-span-5 flex flex-col h-full opacity-0 animate-reveal" style={{ animationDelay: '0.3s' }}>
-                            <div className="mb-auto space-y-8">
-                                <div className="space-y-4">
+                            <div className="mb-auto space-y-4 md:space-y-8">
+                                <div className="space-y-1 md:space-y-4">
 
 
-                                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-brand-ink tracking-tight display-font leading-none">
+                                    <h1 className="text-2xl md:text-5xl lg:text-6xl font-medium text-brand-ink tracking-tight display-font leading-none">
                                         {product.name}
                                     </h1>
 
@@ -232,9 +249,9 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                     )}
                                 </div>
 
-                                <div className="border-y border-brand-ink/5 py-8 space-y-4">
+                                <div className="border-y border-brand-ink/5 py-4 md:py-8 space-y-2 md:space-y-4">
                                     <div className="flex items-baseline justify-between">
-                                        <span className="text-4xl font-medium text-brand-ink display-font tabular-nums">
+                                        <span className="text-2xl md:text-4xl font-medium text-brand-ink display-font tabular-nums">
                                             ${displayPrice.toFixed(2)}
                                         </span>
                                         {displayStock > 0 ? (
@@ -282,14 +299,14 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                                         onClick={() => !isOutOfStock && handleVariantSelect(variant)}
                                                         disabled={isOutOfStock}
                                                         className={`
-                                                        px-6 py-3 border text-[10px] uppercase tracking-widest font-bold font-sans transition-all duration-300 rounded-full
+px - 6 py - 3 border text - [10px] uppercase tracking - widest font - bold font - sans transition - all duration - 300 rounded - full
                                                         ${isOutOfStock
                                                                 ? 'opacity-20 cursor-not-allowed grayscale'
                                                                 : selectedVariant?.id === variant.id
                                                                     ? 'border-brand-ink bg-brand-ink text-brand-ivory'
                                                                     : 'border-brand-ink/10 text-brand-ink/60 hover:border-brand-ink/30'
                                                             }
-                                                    `}
+`}
                                                     >
                                                         {variant.name}
                                                     </button>
@@ -311,12 +328,12 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                                     key={color}
                                                     onClick={() => setActiveColor(color)}
                                                     className={`
-                                                        px-4 py-2 text-[10px] uppercase tracking-widest font-bold border transition-all duration-300 rounded-full
+px - 4 py - 2 text - [10px] uppercase tracking - widest font - bold border transition - all duration - 300 rounded - full
                                                         ${activeColor === color
                                                             ? 'border-brand-ink bg-brand-ink/5 text-brand-ink'
                                                             : 'border-brand-ink/5 text-brand-ink/40 hover:border-brand-ink/20'
                                                         }
-                                                    `}
+`}
                                                     title={color}
                                                 >
                                                     {color}
@@ -327,7 +344,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                 )}
 
                                 {/* Quantity Selector - Minimal */}
-                                <div className="space-y-6">
+                                <div className="space-y-3 md:space-y-6">
                                     <h3 className="text-[11px] uppercase tracking-widest font-bold text-brand-ink/40">Cantidad</h3>
                                     <div className="flex items-center space-x-12">
                                         <div className="flex items-center space-x-8 border-b border-brand-ink/10 pb-2 min-w-[120px]">
@@ -374,14 +391,17 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                             </div>
 
                             {/* Action Area */}
-                            <div className="mt-16 pt-12 border-t border-brand-ink/5 flex flex-col gap-6">
-                                <button
-                                    className={`w-full py-6 text-[10px] uppercase tracking-[0.5em] font-bold transition-all duration-500 shadow-2xl rounded-full ${isAdding ? 'bg-brand-accent text-brand-ivory' : 'bg-brand-ink text-brand-ivory hover:translate-y-[-2px] shadow-brand-ink/20'}`}
+                            <div className="mt-6 md:mt-16 pt-6 md:pt-12 border-t border-brand-ink/5 flex flex-col gap-4 md:gap-6">
+                                <Button
+                                    variant="primary"
+                                    size="lg"
+                                    className={`w-full tracking-[0.2em] ${isAdding ? '!bg-brand-accent border-brand-accent' : ''}`}
                                     onClick={handleAddToCart}
+                                    isLoading={isAdding}
                                     disabled={isAdding || displayStock === 0}
                                 >
-                                    {isAdding ? 'Agregado Correctamente' : displayStock === 0 ? 'Agotado Temporalmente' : 'Agregar a la Cotización'}
-                                </button>
+                                    {isAdding ? 'Agregado al Carrito' : displayStock === 0 ? 'Agotado Temporalmente' : 'Agregar al Carrito'}
+                                </Button>
 
                                 {product.is_customizable && (
                                     <div className="flex flex-col items-center justify-center p-6 bg-brand-ink/[0.02] border border-brand-ink/5 rounded-2xl space-y-2">
@@ -419,38 +439,32 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                 {/* Related Products - Asymmetric Grid */}
                 {
                     relatedProducts.length > 0 && (
-                        <div className="mt-48 opacity-0 animate-reveal" style={{ animationDelay: '0.5s' }}>
-                            <div className="flex items-center space-x-6 mb-16">
-                                <h2 className="text-3xl md:text-5xl font-medium text-brand-ink display-font">Más opciones</h2>
+                        <div className="mt-20 opacity-0 animate-reveal" style={{ animationDelay: '0.5s' }}>
+                            <div className="flex items-center space-x-6 mb-8">
+                                <h2 className="text-2xl md:text-3xl font-medium text-brand-ink display-font">Más opciones</h2>
                                 <div className="h-px flex-1 bg-brand-ink/5"></div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-                                {relatedProducts.map((related, index) => (
+                            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory -mx-6 px-6">
+                                {relatedProducts.map((related) => (
                                     <div
                                         key={related.id}
                                         onClick={() => {
-                                            navigate(`/producto/${related.id}`);
+                                            navigate(`/ producto / ${related.id} `);
                                             window.scrollTo(0, 0);
                                         }}
-                                        className="group cursor-pointer flex flex-col space-y-6"
-                                        style={{ marginTop: index % 2 === 0 ? '0' : '2rem' }}
+                                        className="group cursor-pointer flex-shrink-0 w-40 md:w-48 snap-start"
                                     >
-                                        <div className="aspect-[4/5] relative overflow-hidden bg-brand-ink/[0.02] rounded-2xl">
-                                            <div className="absolute inset-0 border border-brand-ink/5 z-10 pointer-events-none group-hover:inset-4 transition-all duration-700" />
+                                        <div className="relative aspect-[4/5] overflow-hidden bg-brand-ink/[0.02] mb-3 rounded-xl">
                                             <img
                                                 src={related.image_url}
                                                 alt={related.name}
-                                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                loading="lazy"
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <h3 className="text-lg font-medium text-brand-ink display-font group-hover:text-brand-accent transition-colors">{related.name}</h3>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-sm font-bold text-brand-ink/40 tabular-nums">${related.price.toFixed(2)}</span>
-                                                <span className="text-[10px] uppercase tracking-widest font-bold text-brand-ink/30 border-b border-transparent group-hover:border-brand-ink/20 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 opacity-0 group-hover:opacity-100">Ver Catálogo</span>
-                                            </div>
-                                        </div>
+                                        <h3 className="text-sm font-medium text-brand-ink truncate group-hover:text-brand-accent transition-colors">{related.name}</h3>
+                                        <span className="text-sm font-bold text-brand-ink/50 tabular-nums">${related.price.toFixed(2)}</span>
                                     </div>
                                 ))}
                             </div>

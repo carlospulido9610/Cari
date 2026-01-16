@@ -18,6 +18,7 @@ export interface Product {
   featured?: boolean;
   active?: boolean; // Control de visibilidad/stock
   colors?: string[];
+  hardware_color?: 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros'; // Color para herrajes
   min_quantity?: number;
   min_quantity_unit?: string; // 'unidad', 'docena', 'ciento', 'millar', etc.
   is_customizable?: boolean;
