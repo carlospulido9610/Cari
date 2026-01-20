@@ -98,3 +98,21 @@ export interface QuoteEntry extends QuoteRequest {
   created_at: string;
   attended?: boolean; // New field to mark as handled
 }
+
+// ... (existing content)
+
+export interface Hotspot {
+  id: string;
+  x: number;
+  y: number;
+  productId: string;
+}
+
+export interface Look {
+  id: string;
+  image_url: string;
+  title: string;
+  hotspots: Hotspot[];
+  order_index: number;
+  created_at?: string;
+}

@@ -190,17 +190,15 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
 
                         {/* Image Section - Hero Scale */}
                         <div className="lg:col-span-7 space-y-3 md:space-y-8 opacity-0 animate-reveal" style={{ animationDelay: '0.2s' }}>
-                            <div className="w-full aspect-square md:aspect-[4/5] bg-brand-ink/[0.02] overflow-hidden rounded-xl md:rounded-2xl border border-brand-ink/5">
-                                {/* Mobile Back Button */}
-
-
+                            <div className="relative aspect-square md:aspect-[4/5] overflow-hidden bg-brand-ink/[0.02] rounded-xl md:rounded-2xl border border-brand-ink/5 group">
+                                <div className="absolute inset-0 border border-brand-ink/5 z-10 pointer-events-none group-hover:inset-3 transition-all duration-700" />
                                 <img
                                     src={displayImage}
                                     alt={product.name}
-                                    className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
+                                    className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000 ease-out"
                                 />
                                 {product.featured && (
-                                    <div className="absolute top-4 right-4 md:top-8 md:left-8 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.3em] font-bold px-4 py-2 z-10 transition-all duration-300">
+                                    <div className="absolute top-4 right-4 md:top-8 md:left-8 bg-brand-ink text-brand-ivory text-[10px] uppercase tracking-[0.3em] font-bold px-4 py-2 z-20">
                                         Exclusivo
                                     </div>
                                 )}
@@ -208,15 +206,20 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
 
                             {/* Thumbnail Gallery - Refined */}
                             {(() => {
-                                const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
-                                if (allImages.length > 1) {
+                                const variantImages = product.variants?.map(v => v.image_url).filter(Boolean) as string[] || [];
+                                const allImages = Array.from(new Set([
+                                    product.image_url,
+                                    ...(product.additional_images || []),
+                                    ...variantImages
+                                ])).filter(Boolean);
+                                if (allImages.length > 0) {
                                     return (
                                         <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2 md:pb-4 scrollbar-hide">
                                             {allImages.map((img, idx) => (
                                                 <button
                                                     key={idx}
                                                     onClick={() => setDisplayImage(img)}
-                                                    className={`flex - shrink - 0 w - 16 h - 16 md: w - 24 md: h - 24 rounded - xl md: rounded - 2xl overflow - hidden border transition - all ${displayImage === img ? 'border-brand-ink' : 'border-brand-ink/5 hover:border-brand-ink/20 opacity-60 hover:opacity-100'} `}
+                                                    className={`flex-shrink-0 w-16 h-16 md:w-24 md:h-24 rounded-xl md:rounded-2xl overflow-hidden border transition-all ${displayImage === img ? 'border-brand-ink' : 'border-brand-ink/5 hover:border-brand-ink/20 opacity-60 hover:opacity-100'}`}
                                                 >
                                                     <img
                                                         src={img}
@@ -299,7 +302,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = () => {
                                                         onClick={() => !isOutOfStock && handleVariantSelect(variant)}
                                                         disabled={isOutOfStock}
                                                         className={`
-px - 6 py - 3 border text - [10px] uppercase tracking - widest font - bold font - sans transition - all duration - 300 rounded - full
+px-6 py-3 border text-[10px] uppercase tracking-widest font-bold font-sans transition-all duration-300 rounded-full
                                                         ${isOutOfStock
                                                                 ? 'opacity-20 cursor-not-allowed grayscale'
                                                                 : selectedVariant?.id === variant.id
@@ -328,7 +331,7 @@ px - 6 py - 3 border text - [10px] uppercase tracking - widest font - bold font 
                                                     key={color}
                                                     onClick={() => setActiveColor(color)}
                                                     className={`
-px - 4 py - 2 text - [10px] uppercase tracking - widest font - bold border transition - all duration - 300 rounded - full
+px-4 py-2 text-[10px] uppercase tracking-widest font-bold border transition-all duration-300 rounded-full
                                                         ${activeColor === color
                                                             ? 'border-brand-ink bg-brand-ink/5 text-brand-ink'
                                                             : 'border-brand-ink/5 text-brand-ink/40 hover:border-brand-ink/20'

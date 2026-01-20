@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Category, Product, ContactRequest, QuoteRequest, ContactEntry, QuoteEntry } from '../../types';
+import { Category, Product, ContactRequest, QuoteRequest, ContactEntry, QuoteEntry, Look } from '../../types';
 import { productCategories } from '../../data/productCategories';
 
 // NOTE: Ideally, these would be in a .env file.
@@ -523,4 +523,54 @@ export const getSession = async () => {
     return null;
   }
   return data.session;
+};
+
+// --- Shop The Look Management (Admin) ---
+
+export const fetchLooks = async (): Promise<Look[]> => {
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from('shop_the_look')
+    .select('*')
+    .order('order_index', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching looks:', error);
+    return [];
+  }
+  return data as Look[];
+};
+
+export const createLook = async (look: Omit<Look, 'id'>): Promise<Look | null> => {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase.from('shop_the_look').insert([look]).select().single();
+  if (error) {
+    console.error('Error creating look:', error);
+    return null;
+  }
+  return data;
+};
+
+export const updateLook = async (id: string, updates: Partial<Look>): Promise<Look | null> => {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase.from('shop_the_look').update(updates).eq('id', id).select().single();
+  if (error) {
+    console.error('Error updating look:', error);
+    return null;
+  }
+  return data;
+};
+
+export const deleteLook = async (id: string): Promise<boolean> => {
+  if (!supabase) return false;
+
+  const { error } = await supabase.from('shop_the_look').delete().eq('id', id);
+  if (error) {
+    console.error('Error deleting look:', error);
+    return false;
+  }
+  return true;
 };

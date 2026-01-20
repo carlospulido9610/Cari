@@ -8,7 +8,7 @@ import {
 } from '../../services/supabaseClient';
 import { Product, Category, ProductVariant, ContactEntry, QuoteEntry } from '../../../types';
 import { Button } from '../../../components/Button';
-import { Plus, Edit, Trash2, LogOut, CheckCircle, XCircle, Upload, Folder, Package, Search, Filter, MessageSquare, FileText, Scissors, ChevronUp, ChevronDown, ArrowUpDown } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, CheckCircle, XCircle, Upload, Folder, Package, Search, Filter, MessageSquare, FileText, Scissors, ChevronUp, ChevronDown, ArrowUpDown, Eye } from 'lucide-react';
 
 type TabType = 'products' | 'categories' | 'contacts' | 'quotes' | 'service_quotes';
 
@@ -692,16 +692,25 @@ export const AdminDashboard: React.FC = () => {
             {/* Admin Header */}
             <div className="bg-slate-900 text-white px-8 py-4 flex justify-between items-center shadow-lg">
                 <h1 className="text-xl font-bold">Panel de Administración</h1>
-                <button
-                    onClick={() => {
-                        console.log('🟢 Logout button clicked');
-                        handleLogout();
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors font-medium"
-                >
-                    <LogOut className="w-4 h-4" />
-                    Salir
-                </button>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => navigate('/admin/shop-the-look')}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-sm"
+                    >
+                        <Eye className="w-4 h-4" />
+                        Configurar Shop the Look
+                    </button>
+                    <button
+                        onClick={() => {
+                            console.log('🟢 Logout button clicked');
+                            handleLogout();
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 text-white hover:bg-slate-800 rounded-lg transition-colors font-medium"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        Salir
+                    </button>
+                </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

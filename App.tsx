@@ -3,9 +3,10 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Hero } from './components/Hero';
+import { ShopTheLook } from './components/ShopTheLook';
+import { ProductCarousel } from './components/ProductCarousel';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
-import { ServicesSection } from './components/ServicesSection';
 import { ProcessSection } from './components/ProcessSection';
 import { ProductsPage } from './src/pages/ProductsPage';
 import { QuotePage } from './src/pages/QuotePage';
@@ -15,6 +16,7 @@ import { ProductDetailsPage } from './src/pages/ProductDetailsPage';
 import { FAQPage } from './src/pages/FAQPage';
 import { AdminLogin } from './src/pages/admin/AdminLogin';
 import { AdminDashboard } from './src/pages/admin/AdminDashboard';
+import { ConfiguradorShopTheLook } from './src/pages/admin/ConfiguradorShopTheLook';
 import { ToastMessage } from './types';
 import { CartProvider } from './src/context/CartContext';
 import { CartDrawer } from './src/components/CartDrawer';
@@ -25,7 +27,8 @@ function HomePage() {
   return (
     <>
       <Hero />
-      <ServicesSection />
+      <ShopTheLook />
+      <ProductCarousel />
       <ProcessSection />
       {/* Home page can be expanded later with teasers */}
     </>
@@ -95,6 +98,14 @@ function AppLayout() {
             element={
               <ProtectedRoute>
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/shop-the-look"
+            element={
+              <ProtectedRoute>
+                <ConfiguradorShopTheLook />
               </ProtectedRoute>
             }
           />
