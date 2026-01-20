@@ -9,14 +9,16 @@ import {
     ArrowLeft,
     MousePointer2,
     Search,
-    Loader2
+    Loader2,
+    Pencil
 } from 'lucide-react';
 import {
     fetchProducts,
     uploadProductImage,
     createLook,
     fetchLooks,
-    deleteLook
+    deleteLook,
+    updateLook
 } from '../../services/supabaseClient';
 import { Product, Look, Hotspot } from '../../../types';
 import { Button } from '../../../components/Button';
@@ -35,6 +37,7 @@ export const ConfiguradorShopTheLook: React.FC = () => {
     const [hotspots, setHotspots] = useState<Hotspot[]>([]);
     const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [editingLookId, setEditingLookId] = useState<string | null>(null);
 
     const imageRef = useRef<HTMLImageElement>(null);
 
@@ -60,10 +63,31 @@ export const ConfiguradorShopTheLook: React.FC = () => {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result as string);
-                setHotspots([]); // Reset hotspots for new image
+                if (!editingLookId) {
+                    setHotspots([]); // Only reset hotspots if creating a new look
+                }
             };
             reader.readAsDataURL(file);
         }
+    };
+
+    const handleEditLook = (look: Look) => {
+        setEditingLookId(look.id);
+        setTitle(look.title);
+        setImagePreview(look.image_url);
+        setSelectedFile(null); // No new file selected yet
+        setHotspots(look.hotspots);
+        setActiveHotspotId(null);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const resetForm = () => {
+        setEditingLookId(null);
+        setTitle('');
+        setSelectedFile(null);
+        setImagePreview('');
+        setHotspots([]);
+        setActiveHotspotId(null);
     };
 
     const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -96,7 +120,7 @@ export const ConfiguradorShopTheLook: React.FC = () => {
     };
 
     const handleSaveLook = async () => {
-        if (!title.trim() || !selectedFile) {
+        if (!title.trim() || (!imagePreview && !selectedFile)) {
             alert('Por favor agrega un título y selecciona una imagen.');
             return;
         }
@@ -113,24 +137,34 @@ export const ConfiguradorShopTheLook: React.FC = () => {
 
         setIsSaving(true);
         try {
-            const imageUrl = await uploadProductImage(selectedFile);
-            if (!imageUrl) throw new Error('Error al subir la imagen');
+            let imageUrl = imagePreview;
+
+            // If a new file was selected, upload it
+            if (selectedFile) {
+                const uploadedUrl = await uploadProductImage(selectedFile);
+                if (!uploadedUrl) throw new Error('Error al subir la imagen');
+                imageUrl = uploadedUrl;
+            }
 
             const lookData: Omit<Look, 'id'> = {
                 title,
                 image_url: imageUrl,
                 hotspots,
-                order_index: looks.length
+                order_index: editingLookId
+                    ? (looks.find(l => l.id === editingLookId)?.order_index ?? looks.length)
+                    : looks.length
             };
 
-            const result = await createLook(lookData);
+            let result;
+            if (editingLookId) {
+                result = await updateLook(editingLookId, lookData);
+            } else {
+                result = await createLook(lookData);
+            }
+
             if (result) {
-                alert('Look guardado correctamente');
-                // Reset form
-                setTitle('');
-                setSelectedFile(null);
-                setImagePreview('');
-                setHotspots([]);
+                alert(editingLookId ? 'Look actualizado correctamente' : 'Look guardado correctamente');
+                resetForm();
                 loadData();
             }
         } catch (error) {
@@ -185,8 +219,17 @@ export const ConfiguradorShopTheLook: React.FC = () => {
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                         <div className="p-6 border-b border-slate-100">
                             <h2 className="text-lg font-semibold flex items-center gap-2">
-                                <Plus className="w-5 h-5 text-blue-600" />
-                                Crear Nuevo Look
+                                {editingLookId ? (
+                                    <>
+                                        <Pencil className="w-5 h-5 text-blue-600" />
+                                        Editando Look: {title}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus className="w-5 h-5 text-blue-600" />
+                                        Crear Nuevo Look
+                                    </>
+                                )}
                             </h2>
                         </div>
 
@@ -207,7 +250,9 @@ export const ConfiguradorShopTheLook: React.FC = () => {
                                     <label className="text-sm font-medium text-slate-700">Imagen</label>
                                     <label className="flex items-center justify-center gap-2 w-full px-4 py-2 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all">
                                         <Upload className="w-4 h-4 text-slate-500" />
-                                        <span className="text-sm text-slate-600">{selectedFile ? selectedFile.name : 'Subir Imagen'}</span>
+                                        <span className="text-sm text-slate-600">
+                                            {selectedFile ? selectedFile.name : (editingLookId ? 'Cambiar Imagen' : 'Subir Imagen')}
+                                        </span>
                                         <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
                                     </label>
                                 </div>
@@ -264,11 +309,7 @@ export const ConfiguradorShopTheLook: React.FC = () => {
                                     <div className="flex justify-end gap-3">
                                         <Button
                                             variant="secondary"
-                                            onClick={() => {
-                                                setImagePreview('');
-                                                setSelectedFile(null);
-                                                setHotspots([]);
-                                            }}
+                                            onClick={resetForm}
                                         >
                                             Cancelar
                                         </Button>
@@ -372,12 +413,22 @@ export const ConfiguradorShopTheLook: React.FC = () => {
                                             <p className="text-white font-bold text-sm truncate">{look.title}</p>
                                             <div className="flex justify-between items-center mt-1">
                                                 <p className="text-[10px] text-white/70">{look.hotspots.length} productos</p>
-                                                <button
-                                                    onClick={() => handleDeleteLook(look.id)}
-                                                    className="p-1.5 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-colors"
-                                                >
-                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleEditLook(look)}
+                                                        className="p-1.5 bg-white/20 hover:bg-white/40 text-white rounded-lg transition-colors"
+                                                        title="Editar Look"
+                                                    >
+                                                        <Pencil className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteLook(look.id)}
+                                                        className="p-1.5 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-colors"
+                                                        title="Eliminar Look"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

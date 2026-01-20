@@ -8,7 +8,7 @@ interface ContactPageProps {
 
 export const ContactPage: React.FC<ContactPageProps> = ({ onSuccess, onError }) => {
     return (
-        <div className="pt-20 md:pt-24 min-h-screen bg-[#fdfdfd]">
+        <div className="pt-16 md:pt-24 min-h-screen bg-[#fdfdfd]">
             <ContactSection onSuccess={onSuccess} onError={onError} />
         </div>
     );

@@ -50,15 +50,13 @@ export const ProductCarousel: React.FC = () => {
     if (products.length === 0) return null;
 
     return (
-        <section className="py-24 bg-brand-ivory relative overflow-hidden">
-            {/* Decorative Background Elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <section className="pt-24 pb-12 bg-brand-ivory relative overflow-hidden">
+            {/* Decorative Background Elements - Removed for cleaner look */}
 
-            <div className="max-w-7xl mx-auto px-6 lg:px-12 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="max-w-7xl mx-auto px-6 lg:px-12 mb-12 flex flex-col items-center justify-center text-center gap-8">
                 <div>
-                    <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-bold mb-3">Colección Destacada</p>
                     <h2 className="text-3xl md:text-5xl font-medium text-brand-ink display-font">
-                        Nuestros <span className="font-bold">Favoritos</span>
+                        Selección <span className="font-bold">Exclusiva</span>
                     </h2>
                 </div>
 

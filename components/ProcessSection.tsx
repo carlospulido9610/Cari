@@ -3,7 +3,7 @@ import { Sparkles, Factory } from 'lucide-react';
 
 export const ProcessSection: React.FC = () => {
     return (
-        <section className="py-32 bg-brand-ivory relative overflow-hidden">
+        <section className="py-16 bg-brand-ivory relative overflow-hidden">
             {/* Decorative background elements */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-brand-ink/5 to-transparent" />

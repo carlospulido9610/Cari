@@ -353,10 +353,12 @@ export const uploadProductImage = async (file: File): Promise<string | null> => 
       return null;
     }
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
     if (file.size > maxSize) {
-      console.error('File too large. Maximum size is 5MB.');
+      const msg = 'El archivo es demasiado grande. El máximo permitido es 10MB.';
+      console.error(msg);
+      alert(msg);
       return null;
     }
 
@@ -376,6 +378,7 @@ export const uploadProductImage = async (file: File): Promise<string | null> => 
 
     if (error) {
       console.error('Error uploading image:', error);
+      alert(`Error de subida: ${error.message} (Detalles: ${JSON.stringify(error)})`);
       return null;
     }
 
