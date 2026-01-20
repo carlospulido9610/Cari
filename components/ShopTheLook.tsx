@@ -119,7 +119,7 @@ export const ShopTheLook: React.FC = () => {
                                                     aria-label={isActive ? "Cerrar" : "Ver producto"}
                                                 >
                                                     {isActive ? <X className="w-3 h-3" /> : <Plus className="w-2.5 h-2.5 opacity-50" />}
-                                                    <div className={`absolute -inset-1.5 rounded-full border border-white/10 ${isActive ? '' : 'animate-pulse'}`} />
+                                                    <div className={`absolute -inset-2 rounded-full border border-white/20 ${isActive ? '' : 'animate-ping'}`} />
                                                 </button>
 
                                                 {/* Popover Product Card */}
