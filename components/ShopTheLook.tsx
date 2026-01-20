@@ -129,11 +129,6 @@ export const ShopTheLook: React.FC = () => {
                                                         ${isOnBottomHalf ? 'bottom-full mb-4' : 'top-full mt-4'}
                                                         hidden md:block`}
                                                     >
-                                                        {/* Pointer arrow - flips up or down */}
-                                                        <div className={`absolute left-0 -translate-x-1/2 border-8 border-transparent 
-                                                            ${isOnBottomHalf ? 'top-full border-t-white' : 'bottom-full border-b-white'}`}
-                                                        />
-
                                                         {(() => {
                                                             const product = products[spot.productId];
                                                             if (!product) return null;
