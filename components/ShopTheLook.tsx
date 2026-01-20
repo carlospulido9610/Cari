@@ -125,12 +125,12 @@ export const ShopTheLook: React.FC = () => {
                                                 {/* Popover Product Card */}
                                                 {isActive && (
                                                     <div
-                                                        className={`absolute left-1/2 -translate-x-1/2 w-64 bg-white p-3 rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 
+                                                        className={`absolute left-0 -translate-x-1/2 w-64 bg-white p-3 rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 
                                                         ${isOnBottomHalf ? 'bottom-full mb-4' : 'top-full mt-4'}
                                                         hidden md:block`}
                                                     >
                                                         {/* Pointer arrow - flips up or down */}
-                                                        <div className={`absolute left-1/2 -translate-x-1/2 border-8 border-transparent 
+                                                        <div className={`absolute left-0 -translate-x-1/2 border-8 border-transparent 
                                                             ${isOnBottomHalf ? 'top-full border-t-white' : 'bottom-full border-b-white'}`}
                                                         />
 
