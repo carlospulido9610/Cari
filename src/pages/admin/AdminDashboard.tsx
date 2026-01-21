@@ -8,7 +8,8 @@ import {
 } from '../../services/supabaseClient';
 import { Product, Category, ProductVariant, ContactEntry, QuoteEntry } from '../../../types';
 import { Button } from '../../../components/Button';
-import { Plus, Edit, Trash2, LogOut, CheckCircle, XCircle, Upload, Folder, Package, Search, Filter, MessageSquare, FileText, Scissors, ChevronUp, ChevronDown, ArrowUpDown, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, CheckCircle, XCircle, Upload, Folder, Package, Search, Filter, MessageSquare, FileText, Scissors, ChevronUp, ChevronDown, ArrowUpDown, Eye, Download, FileSpreadsheet, File as FileIcon } from 'lucide-react';
+import { exportToExcel, exportToPDF } from '../../utils/exportUtils';
 
 type TabType = 'products' | 'categories' | 'contacts' | 'quotes' | 'service_quotes';
 
@@ -76,6 +77,9 @@ export const AdminDashboard: React.FC = () => {
     const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
     const [bulkEditData, setBulkEditData] = useState<{ category_id?: string; price?: number; hardware_color?: 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | '' }>({});
+
+    // Export Menu State
+    const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
 
     useEffect(() => {
@@ -815,6 +819,62 @@ export const AdminDashboard: React.FC = () => {
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
                                     </select>
+                                </div>
+
+                                {/* Export Button */}
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors font-medium text-slate-700 shadow-sm"
+                                    >
+                                        <Download className="w-4 h-4 text-slate-500" />
+                                        Exportar
+                                        <ChevronDown className="w-3 h-3 ml-1 text-slate-400" />
+                                    </button>
+
+                                    {isExportMenuOpen && (
+                                        <>
+                                            <div
+                                                className="fixed inset-0 z-20"
+                                                onClick={() => setIsExportMenuOpen(false)}
+                                            />
+                                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-slate-100 z-30 overflow-hidden ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-100">
+                                                <div className="p-2 border-b border-slate-100 bg-slate-50/50">
+                                                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-2">Formatos</p>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        exportToExcel(filteredProducts, categories);
+                                                        setIsExportMenuOpen(false);
+                                                    }}
+                                                    className="w-full text-left px-4 py-3 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3 text-sm text-slate-700 transition-colors"
+                                                >
+                                                    <div className="p-1.5 bg-green-100 text-green-600 rounded-lg">
+                                                        <FileSpreadsheet className="w-4 h-4" />
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-medium block">Excel (.xlsx)</span>
+                                                        <span className="text-xs text-slate-400">Para análisis de datos</span>
+                                                    </div>
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        exportToPDF(filteredProducts, categories);
+                                                        setIsExportMenuOpen(false);
+                                                    }}
+                                                    className="w-full text-left px-4 py-3 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3 text-sm text-slate-700 transition-colors"
+                                                >
+                                                    <div className="p-1.5 bg-red-100 text-red-600 rounded-lg">
+                                                        <FileIcon className="w-4 h-4" />
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-medium block">PDF (.pdf)</span>
+                                                        <span className="text-xs text-slate-400">Versión para imprimir</span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
 
                                 <Button onClick={() => openProductModal()}>

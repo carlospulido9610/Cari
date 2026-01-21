@@ -11,12 +11,15 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.8",
     "@supabase/supabase-js": "^2.87.1",
+    "jspdf": "^4.0.0",
+    "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.556.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-qr-code": "^2.0.18",
     "react-router-dom": "^7.10.1",
-    "use-places-autocomplete": "^4.0.1"
+    "use-places-autocomplete": "^4.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
