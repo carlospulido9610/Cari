@@ -21,6 +21,54 @@ const parseNumberInput = (value: string): number | undefined => {
     return isNaN(num) ? undefined : num;
 };
 
+// Export Handler
+const handleExport = async (
+    config: { format: 'excel' | 'pdf', includeImages: boolean, categoryId: string, maxStock: string },
+    allProducts: Product[],
+    categories: Category[],
+    setLoading: (l: boolean) => void,
+    onClose: () => void
+) => {
+    setLoading(true);
+    // 1. Filter Products
+    let exportList = [...allProducts];
+
+    // Filter by Category
+    if (config.categoryId !== 'all') {
+        exportList = exportList.filter(p => p.category_id === config.categoryId);
+    }
+
+    // Filter by Max Stock (Minimo de stock interpretation: "stock <= X")
+    if (config.maxStock !== '') {
+        const threshold = parseInt(config.maxStock);
+        if (!isNaN(threshold)) {
+            exportList = exportList.filter(p => (p.stock || 0) <= threshold);
+        }
+    }
+
+    if (exportList.length === 0) {
+        alert('No hay productos que coincidan con los filtros de exportación.');
+        setLoading(false);
+        return;
+    }
+
+    // 2. Export
+    try {
+        if (config.format === 'excel') {
+            exportToExcel(exportList, categories);
+        } else {
+            // PDF
+            await exportToPDF(exportList, categories, { includeImages: config.includeImages });
+        }
+        onClose();
+    } catch (error) {
+        console.error("Export error:", error);
+        alert("Ocurrió un error generaando la exportación.");
+    } finally {
+        setLoading(false);
+    }
+};
+
 export const AdminDashboard: React.FC = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('products');
@@ -77,6 +125,16 @@ export const AdminDashboard: React.FC = () => {
     const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
     const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
     const [bulkEditData, setBulkEditData] = useState<{ category_id?: string; price?: number; hardware_color?: 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | '' }>({});
+
+    // Export State
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
+    const [exportConfig, setExportConfig] = useState({
+        format: 'excel' as 'excel' | 'pdf',
+        includeImages: false,
+        categoryId: 'all',
+        maxStock: '',
+    });
 
     // Export Menu State
     const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
@@ -822,59 +880,14 @@ export const AdminDashboard: React.FC = () => {
                                 </div>
 
                                 {/* Export Button */}
-                                <div className="relative">
+                                <div>
                                     <button
-                                        onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+                                        onClick={() => setIsExportModalOpen(true)}
                                         className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors font-medium text-slate-700 shadow-sm"
                                     >
                                         <Download className="w-4 h-4 text-slate-500" />
                                         Exportar
-                                        <ChevronDown className="w-3 h-3 ml-1 text-slate-400" />
                                     </button>
-
-                                    {isExportMenuOpen && (
-                                        <>
-                                            <div
-                                                className="fixed inset-0 z-20"
-                                                onClick={() => setIsExportMenuOpen(false)}
-                                            />
-                                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-slate-100 z-30 overflow-hidden ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-100">
-                                                <div className="p-2 border-b border-slate-100 bg-slate-50/50">
-                                                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-2">Formatos</p>
-                                                </div>
-                                                <button
-                                                    onClick={() => {
-                                                        exportToExcel(filteredProducts, categories);
-                                                        setIsExportMenuOpen(false);
-                                                    }}
-                                                    className="w-full text-left px-4 py-3 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3 text-sm text-slate-700 transition-colors"
-                                                >
-                                                    <div className="p-1.5 bg-green-100 text-green-600 rounded-lg">
-                                                        <FileSpreadsheet className="w-4 h-4" />
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-medium block">Excel (.xlsx)</span>
-                                                        <span className="text-xs text-slate-400">Para análisis de datos</span>
-                                                    </div>
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        exportToPDF(filteredProducts, categories);
-                                                        setIsExportMenuOpen(false);
-                                                    }}
-                                                    className="w-full text-left px-4 py-3 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3 text-sm text-slate-700 transition-colors"
-                                                >
-                                                    <div className="p-1.5 bg-red-100 text-red-600 rounded-lg">
-                                                        <FileIcon className="w-4 h-4" />
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-medium block">PDF (.pdf)</span>
-                                                        <span className="text-xs text-slate-400">Versión para imprimir</span>
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
                                 </div>
 
                                 <Button onClick={() => openProductModal()}>
@@ -1528,843 +1541,975 @@ export const AdminDashboard: React.FC = () => {
                 </div>
             )}
 
-            {/* PRODUCT MODAL */}
-            {isProductModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h3 className="text-xl font-bold">{editingProduct ? 'Editar Producto' : 'Crear Nuevo Producto'}</h3>
-                            <button onClick={() => setIsProductModalOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Cerrar modal">
-                                <XCircle className="w-6 h-6" />
-                            </button>
-                        </div>
 
-                        <form onSubmit={handleProductSubmit} className="p-6 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="col-span-2">
-                                    <label htmlFor="product-name" className="block text-sm font-medium text-slate-700 mb-1">Nombre del Producto</label>
-                                    <input
-                                        id="product-name"
-                                        required
-                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        value={formData.name || ''}
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    />
-                                </div>
 
-                                <div>
-                                    <label htmlFor="product-sku" className="block text-sm font-medium text-slate-700 mb-1">SKU (Código Único)</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            id="product-sku"
-                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none font-mono uppercase"
-                                            value={formData.sku || ''}
-                                            onChange={e => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
-                                            placeholder="CATEGORIA-PRODUCTO-0000"
-                                        />
-                                        <Button type="button" onClick={generateSKU} className="whitespace-nowrap" title="Generar SKU Automático">
-                                            Generar SKU
-                                        </Button>
+            {/* EXPORT MODAL */}
+            {
+                isExportModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+                            <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                    <Download className="w-5 h-5 text-blue-600" />
+                                    Exportar Inventario
+                                </h3>
+                                <button
+                                    onClick={() => setIsExportModalOpen(false)}
+                                    className="text-slate-400 hover:text-slate-600 p-1"
+                                >
+                                    <XCircle className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="p-6 space-y-5">
+                                {/* Format Selection */}
+                                <div className="space-y-3">
+                                    <label className="text-sm font-semibold text-slate-700 block">Formato</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            onClick={() => setExportConfig({ ...exportConfig, format: 'excel' })}
+                                            className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all ${exportConfig.format === 'excel'
+                                                ? 'border-green-500 bg-green-50 text-green-700'
+                                                : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200'
+                                                }`}
+                                        >
+                                            <FileSpreadsheet className="w-6 h-6 mb-2" />
+                                            <span className="text-xs font-medium">Excel</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setExportConfig({ ...exportConfig, format: 'pdf' })}
+                                            className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all ${exportConfig.format === 'pdf'
+                                                ? 'border-red-500 bg-red-50 text-red-700'
+                                                : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200'
+                                                }`}
+                                        >
+                                            <FileIcon className="w-6 h-6 mb-2" />
+                                            <span className="text-xs font-medium">PDF</span>
+                                        </button>
                                     </div>
-                                    <p className="text-xs text-slate-400 mt-1">
-                                        Formato sugerido: CAT-PRO-0000. Haz clic en Generar para crear uno basado en el nombre y categoría.
-                                    </p>
                                 </div>
 
-                                <div>
-                                    <label htmlFor="product-price" className="block text-sm font-medium text-slate-700 mb-1">Precio</label>
-                                    <input
-                                        id="product-price"
-                                        type="number"
-                                        step="0.01"
-                                        min="0.01"
-                                        required
-                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        value={formData.price ?? ''}
-                                        onChange={e => setFormData({ ...formData, price: parseNumberInput(e.target.value) })}
-                                    />
+                                {/* Options for PDF */}
+                                {exportConfig.format === 'pdf' && (
+                                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                                                checked={exportConfig.includeImages}
+                                                onChange={(e) => setExportConfig({ ...exportConfig, includeImages: e.target.checked })}
+                                            />
+                                            <span className="text-sm text-slate-700">Incluir imágenes de productos</span>
+                                        </label>
+                                        {exportConfig.includeImages && (
+                                            <p className="text-xs text-amber-600 mt-2 ml-7">
+                                                Nota: El proceso puede tardar unos segundos.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+
+                                <div className="border-t border-slate-100 pt-5 space-y-4">
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Filtros Opcionales</p>
+
+                                    {/* Category Filter */}
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-600 mb-1">Categoría</label>
+                                        <select
+                                            className="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={exportConfig.categoryId}
+                                            onChange={(e) => setExportConfig({ ...exportConfig, categoryId: e.target.value })}
+                                        >
+                                            <option value="all">Todas las categorías</option>
+                                            {categories.map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Stock Filter */}
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-600 mb-1">Stock menor o igual a:</label>
+                                        <input
+                                            type="number"
+                                            placeholder="Ej. 5"
+                                            className="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={exportConfig.maxStock}
+                                            onChange={(e) => setExportConfig({ ...exportConfig, maxStock: e.target.value })}
+                                        />
+                                        <p className="text-[10px] text-slate-400 mt-1">Deja vacío para exportar todo</p>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <label htmlFor="product-stock" className="block text-sm font-medium text-slate-700 mb-1">Stock Disponible</label>
-                                    <input
-                                        id="product-stock"
-                                        type="number"
-                                        min="0"
-                                        required
-                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        value={formData.stock ?? ''}
-                                        onChange={e => setFormData({ ...formData, stock: parseNumberInput(e.target.value) })}
-                                    />
-                                </div>
+                                <button
+                                    disabled={exportLoading}
+                                    onClick={() => handleExport(
+                                        exportConfig,
+                                        products, // Use *all* products so filters apply to the full set
+                                        categories,
+                                        setExportLoading,
+                                        () => setIsExportModalOpen(false)
+                                    )}
+                                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg shadow-slate-900/20 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                                >
+                                    {exportLoading ? (
+                                        <>
+                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                            Generando...
+                                        </>
+                                    ) : (
+                                        <>Obtener Reporte</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
 
-                                <div>
-                                    <label htmlFor="category_id" className="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
-                                    <select
-                                        id="category_id"
-                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        value={formData.category_id || ''}
-                                        onChange={e => setFormData({ ...formData, category_id: e.target.value })}
-                                    >
-                                        {categories.map(c => (
-                                            <option key={c.id} value={c.id}>{c.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
+            {/* PRODUCT MODAL */}
+            {
+                isProductModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                                <h3 className="text-xl font-bold">{editingProduct ? 'Editar Producto' : 'Crear Nuevo Producto'}</h3>
+                                <button onClick={() => setIsProductModalOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Cerrar modal">
+                                    <XCircle className="w-6 h-6" />
+                                </button>
+                            </div>
 
-                                {/* Hardware Color Selector - Only for Herrajes category */}
-                                {(() => {
-                                    const selectedCat = categories.find(c => c.id === formData.category_id);
-                                    const isHerrajesCategory = selectedCat?.slug === 'herrajes' ||
-                                        categories.find(c => c.id === selectedCat?.parent_id)?.slug === 'herrajes';
+                            <form onSubmit={handleProductSubmit} className="p-6 space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="col-span-2">
+                                        <label htmlFor="product-name" className="block text-sm font-medium text-slate-700 mb-1">Nombre del Producto</label>
+                                        <input
+                                            id="product-name"
+                                            required
+                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={formData.name || ''}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        />
+                                    </div>
 
-                                    if (!isHerrajesCategory) return null;
-
-                                    return (
-                                        <div>
-                                            <label htmlFor="hardware_color" className="block text-sm font-medium text-slate-700 mb-1">Color de Herraje</label>
-                                            <select
-                                                id="hardware_color"
-                                                className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                                value={formData.hardware_color || ''}
-                                                onChange={e => setFormData({ ...formData, hardware_color: e.target.value as 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | undefined })}
-                                            >
-                                                <option value="">Sin especificar</option>
-                                                <option value="Dorado">Dorado</option>
-                                                <option value="Plata">Plata</option>
-                                                <option value="GoldenRose">GoldenRose</option>
-                                                <option value="Otros">Otros</option>
-                                            </select>
-                                        </div>
-                                    );
-                                })()}
-
-                                {/* NEW FIELDS: Quantity & Customization */}
-                                <div className="col-span-2 grid grid-cols-1 gap-6 bg-slate-50 p-6 rounded-xl border border-slate-100">
-                                    <div className="space-y-3">
-                                        <label htmlFor="min-quantity" className="block text-sm font-medium text-slate-700">Cantidad Mínima</label>
+                                    <div>
+                                        <label htmlFor="product-sku" className="block text-sm font-medium text-slate-700 mb-1">SKU (Código Único)</label>
                                         <div className="flex gap-2">
                                             <input
-                                                id="min-quantity"
-                                                type="number"
-                                                min="1"
-                                                className="w-24 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                                value={formData.min_quantity ?? ''}
-                                                onChange={e => setFormData({ ...formData, min_quantity: parseNumberInput(e.target.value) })}
+                                                id="product-sku"
+                                                className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none font-mono uppercase"
+                                                value={formData.sku || ''}
+                                                onChange={e => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
+                                                placeholder="CATEGORIA-PRODUCTO-0000"
                                             />
-                                            <select
-                                                id="min_quantity_unit"
-                                                aria-label="Unidad de medida"
-                                                className="flex-1 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                                value={formData.min_quantity_unit || 'unidad'}
-                                                onChange={e => setFormData({ ...formData, min_quantity_unit: e.target.value })}
-                                            >
-                                                <option value="unidad">Unidad(es)</option>
-                                                <option value="docena">Docena(s)</option>
-                                                <option value="ciento">Ciento(s)</option>
-                                                <option value="millar">Millar(es)</option>
-                                                <option value="kg">Kilogramo(s)</option>
-                                                <option value="m">Metro(s)</option>
-                                                <option value="otro">Otro</option>
-                                            </select>
+                                            <Button type="button" onClick={generateSKU} className="whitespace-nowrap" title="Generar SKU Automático">
+                                                Generar SKU
+                                            </Button>
                                         </div>
+                                        <p className="text-xs text-slate-400 mt-1">
+                                            Formato sugerido: CAT-PRO-0000. Haz clic en Generar para crear uno basado en el nombre y categoría.
+                                        </p>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <input
-                                                type="checkbox"
-                                                id="is_customizable"
-                                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
-                                                checked={formData.is_customizable || false}
-                                                onChange={e => setFormData({ ...formData, is_customizable: e.target.checked })}
-                                            />
-                                            <label htmlFor="is_customizable" className="text-sm font-medium text-slate-700">¿Producto Personalizable?</label>
-                                        </div>
-
-                                        {formData.is_customizable && (
-                                            <div>
-                                                <label htmlFor="customization_price" className="block text-xs text-slate-500 mb-1">Costo Adicional por Personalización</label>
-                                                <div className="relative">
-                                                    <span className="absolute left-3 top-2.5 text-slate-400">$</span>
-                                                    <input
-                                                        id="customization_price"
-                                                        type="number"
-                                                        step="0.01"
-                                                        className="w-full border border-slate-300 rounded-lg pl-7 p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                                        value={formData.customization_price ?? ''}
-                                                        onChange={e => setFormData({ ...formData, customization_price: parseNumberInput(e.target.value) })}
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
+                                    <div>
+                                        <label htmlFor="product-price" className="block text-sm font-medium text-slate-700 mb-1">Precio</label>
+                                        <input
+                                            id="product-price"
+                                            type="number"
+                                            step="0.01"
+                                            min="0.01"
+                                            required
+                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={formData.price ?? ''}
+                                            onChange={e => setFormData({ ...formData, price: parseNumberInput(e.target.value) })}
+                                        />
                                     </div>
 
-                                    {/* 3. Variants */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <input
-                                                type="checkbox"
-                                                id="has_variants"
-                                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
-                                                checked={formData.has_variants || false}
-                                                onChange={e => setFormData({ ...formData, has_variants: e.target.checked })}
-                                            />
-                                            <label htmlFor="has_variants" className="text-sm font-medium text-slate-700">Variantes de Tipo</label>
+                                    <div>
+                                        <label htmlFor="product-stock" className="block text-sm font-medium text-slate-700 mb-1">Stock Disponible</label>
+                                        <input
+                                            id="product-stock"
+                                            type="number"
+                                            min="0"
+                                            required
+                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={formData.stock ?? ''}
+                                            onChange={e => setFormData({ ...formData, stock: parseNumberInput(e.target.value) })}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="category_id" className="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
+                                        <select
+                                            id="category_id"
+                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={formData.category_id || ''}
+                                            onChange={e => setFormData({ ...formData, category_id: e.target.value })}
+                                        >
+                                            {categories.map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Hardware Color Selector - Only for Herrajes category */}
+                                    {(() => {
+                                        const selectedCat = categories.find(c => c.id === formData.category_id);
+                                        const isHerrajesCategory = selectedCat?.slug === 'herrajes' ||
+                                            categories.find(c => c.id === selectedCat?.parent_id)?.slug === 'herrajes';
+
+                                        if (!isHerrajesCategory) return null;
+
+                                        return (
+                                            <div>
+                                                <label htmlFor="hardware_color" className="block text-sm font-medium text-slate-700 mb-1">Color de Herraje</label>
+                                                <select
+                                                    id="hardware_color"
+                                                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    value={formData.hardware_color || ''}
+                                                    onChange={e => setFormData({ ...formData, hardware_color: e.target.value as 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | undefined })}
+                                                >
+                                                    <option value="">Sin especificar</option>
+                                                    <option value="Dorado">Dorado</option>
+                                                    <option value="Plata">Plata</option>
+                                                    <option value="GoldenRose">GoldenRose</option>
+                                                    <option value="Otros">Otros</option>
+                                                </select>
+                                            </div>
+                                        );
+                                    })()}
+
+                                    {/* NEW FIELDS: Quantity & Customization */}
+                                    <div className="col-span-2 grid grid-cols-1 gap-6 bg-slate-50 p-6 rounded-xl border border-slate-100">
+                                        <div className="space-y-3">
+                                            <label htmlFor="min-quantity" className="block text-sm font-medium text-slate-700">Cantidad Mínima</label>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    id="min-quantity"
+                                                    type="number"
+                                                    min="1"
+                                                    className="w-24 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    value={formData.min_quantity ?? ''}
+                                                    onChange={e => setFormData({ ...formData, min_quantity: parseNumberInput(e.target.value) })}
+                                                />
+                                                <select
+                                                    id="min_quantity_unit"
+                                                    aria-label="Unidad de medida"
+                                                    className="flex-1 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    value={formData.min_quantity_unit || 'unidad'}
+                                                    onChange={e => setFormData({ ...formData, min_quantity_unit: e.target.value })}
+                                                >
+                                                    <option value="unidad">Unidad(es)</option>
+                                                    <option value="docena">Docena(s)</option>
+                                                    <option value="ciento">Ciento(s)</option>
+                                                    <option value="millar">Millar(es)</option>
+                                                    <option value="kg">Kilogramo(s)</option>
+                                                    <option value="m">Metro(s)</option>
+                                                    <option value="otro">Otro</option>
+                                                </select>
+                                            </div>
                                         </div>
 
-                                        {formData.has_variants && (
-                                            <div>
-                                                <label className="block text-xs text-slate-500 mb-1">Descripción del Tipo</label>
-                                                <div className="relative">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Ej: Material (Algodón, Lino...)"
-                                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                                        value={formData.variant_type || ''}
-                                                        onChange={e => setFormData({ ...formData, variant_type: e.target.value })}
-                                                    />
-                                                </div>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <input
+                                                    type="checkbox"
+                                                    id="is_customizable"
+                                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                                                    checked={formData.is_customizable || false}
+                                                    onChange={e => setFormData({ ...formData, is_customizable: e.target.checked })}
+                                                />
+                                                <label htmlFor="is_customizable" className="text-sm font-medium text-slate-700">¿Producto Personalizable?</label>
                                             </div>
-                                        )}
 
-                                        {formData.has_variants && (
-                                            <div className="mt-4 pt-4 border-t border-slate-200 animate-fade-in">
-                                                <h4 className="text-sm font-semibold text-slate-700 mb-3">Lista de Variantes</h4>
-
-                                                {/* Add Variant Form */}
-                                                <div className="space-y-3 mb-4 bg-white p-4 rounded-lg border border-slate-200">
-                                                    <h5 className="text-xs font-semibold text-slate-600 uppercase">Agregar Nueva Variante</h5>
-                                                    <div className="flex gap-2 items-end">
-                                                        <div className="flex-1">
-                                                            <label htmlFor="new_variant_name" className="block text-xs text-slate-500 mb-1">Nombre (Ej: XL, 500g)</label>
-                                                            <input
-                                                                id="new_variant_name"
-                                                                type="text"
-                                                                value={newVariantName}
-                                                                onChange={e => setNewVariantName(e.target.value)}
-                                                                className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500"
-                                                                placeholder="Opción"
-                                                            />
-                                                        </div>
-                                                        <div className="w-24">
-                                                            <label htmlFor="new_variant_price" className="block text-xs text-slate-500 mb-1">Precio</label>
-                                                            <input
-                                                                id="new_variant_price"
-                                                                type="number"
-                                                                step="0.01"
-                                                                min="0.01"
-                                                                value={newVariantPrice}
-                                                                onChange={e => setNewVariantPrice(e.target.value === '' ? '' : parseFloat(e.target.value))}
-                                                                className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500"
-                                                            />
-                                                        </div>
-                                                        <div className="w-32">
-                                                            <label htmlFor="new_variant_sku" className="block text-xs text-slate-500 mb-1">SKU (Opcional)</label>
-                                                            <div className="flex gap-1">
-                                                                <input
-                                                                    id="new_variant_sku"
-                                                                    type="text"
-                                                                    value={newVariantSku}
-                                                                    onChange={e => setNewVariantSku(e.target.value.toUpperCase())}
-                                                                    className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500 uppercase font-mono"
-                                                                    placeholder="SKU-VAR"
-                                                                />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={generateVariantSKU}
-                                                                    className="p-2 bg-slate-100 hover:bg-slate-200 rounded text-slate-600 transition-colors"
-                                                                    title="Generar SKU basado en Producto"
-                                                                >
-                                                                    <Upload className="w-4 h-4 rotate-90" />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div className="w-24">
-                                                            <label htmlFor="new_variant_stock" className="block text-xs text-slate-500 mb-1">Stock</label>
-                                                            <input
-                                                                id="new_variant_stock"
-                                                                type="number"
-                                                                min="0"
-                                                                value={newVariantStock}
-                                                                onChange={e => setNewVariantStock(e.target.value === '' ? '' : parseInt(e.target.value))}
-                                                                className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500"
-                                                            />
-                                                        </div>
-                                                        <Button
-                                                            type="button"
-                                                            size="sm"
-                                                            onClick={handleAddVariant}
-                                                            className="mb-[1px]"
-                                                            disabled={isUploading}
-                                                        >
-                                                            {isUploading ? 'Subiendo...' : 'Agregar'}
-                                                        </Button>
+                                            {formData.is_customizable && (
+                                                <div>
+                                                    <label htmlFor="customization_price" className="block text-xs text-slate-500 mb-1">Costo Adicional por Personalización</label>
+                                                    <div className="relative">
+                                                        <span className="absolute left-3 top-2.5 text-slate-400">$</span>
+                                                        <input
+                                                            id="customization_price"
+                                                            type="number"
+                                                            step="0.01"
+                                                            className="w-full border border-slate-300 rounded-lg pl-7 p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                            value={formData.customization_price ?? ''}
+                                                            onChange={e => setFormData({ ...formData, customization_price: parseNumberInput(e.target.value) })}
+                                                        />
                                                     </div>
+                                                </div>
+                                            )}
+                                        </div>
 
-                                                    {/* Image Upload Options */}
-                                                    <div className="space-y-2">
-                                                        <label className="block text-xs font-semibold text-slate-600">Imagen de Variante</label>
+                                        {/* 3. Variants */}
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <input
+                                                    type="checkbox"
+                                                    id="has_variants"
+                                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                                                    checked={formData.has_variants || false}
+                                                    onChange={e => setFormData({ ...formData, has_variants: e.target.checked })}
+                                                />
+                                                <label htmlFor="has_variants" className="text-sm font-medium text-slate-700">Variantes de Tipo</label>
+                                            </div>
 
-                                                        {/* File Upload Option */}
-                                                        <div className="flex gap-2 items-start">
+                                            {formData.has_variants && (
+                                                <div>
+                                                    <label className="block text-xs text-slate-500 mb-1">Descripción del Tipo</label>
+                                                    <div className="relative">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Ej: Material (Algodón, Lino...)"
+                                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                            value={formData.variant_type || ''}
+                                                            onChange={e => setFormData({ ...formData, variant_type: e.target.value })}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {formData.has_variants && (
+                                                <div className="mt-4 pt-4 border-t border-slate-200 animate-fade-in">
+                                                    <h4 className="text-sm font-semibold text-slate-700 mb-3">Lista de Variantes</h4>
+
+                                                    {/* Add Variant Form */}
+                                                    <div className="space-y-3 mb-4 bg-white p-4 rounded-lg border border-slate-200">
+                                                        <h5 className="text-xs font-semibold text-slate-600 uppercase">Agregar Nueva Variante</h5>
+                                                        <div className="flex gap-2 items-end">
                                                             <div className="flex-1">
-                                                                <label htmlFor="new_variant_image_file" className="block text-xs text-slate-500 mb-1">Subir Archivo</label>
+                                                                <label htmlFor="new_variant_name" className="block text-xs text-slate-500 mb-1">Nombre (Ej: XL, 500g)</label>
                                                                 <input
-                                                                    id="new_variant_image_file"
-                                                                    type="file"
-                                                                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                                                                    onChange={(e) => {
-                                                                        const file = e.target.files?.[0];
-                                                                        if (file) {
-                                                                            setNewVariantImageFile(file);
-                                                                            const reader = new FileReader();
-                                                                            reader.onloadend = () => {
-                                                                                setVariantImagePreview(reader.result as string);
-                                                                            };
-                                                                            reader.readAsDataURL(file);
-                                                                            // Clear URL input if file is selected
-                                                                            setNewVariantImageUrl('');
-                                                                        }
-                                                                    }}
-                                                                    className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                                                    id="new_variant_name"
+                                                                    type="text"
+                                                                    value={newVariantName}
+                                                                    onChange={e => setNewVariantName(e.target.value)}
+                                                                    className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500"
+                                                                    placeholder="Opción"
                                                                 />
                                                             </div>
-                                                            {(variantImagePreview || newVariantImageUrl) && (
-                                                                <img
-                                                                    src={variantImagePreview || newVariantImageUrl}
-                                                                    alt="Preview"
-                                                                    className="w-12 h-12 object-cover rounded border border-slate-200"
+                                                            <div className="w-24">
+                                                                <label htmlFor="new_variant_price" className="block text-xs text-slate-500 mb-1">Precio</label>
+                                                                <input
+                                                                    id="new_variant_price"
+                                                                    type="number"
+                                                                    step="0.01"
+                                                                    min="0.01"
+                                                                    value={newVariantPrice}
+                                                                    onChange={e => setNewVariantPrice(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                                                                    className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500"
                                                                 />
-                                                            )}
-                                                        </div>
-
-                                                        {/* URL Option */}
-                                                        <div>
-                                                            <label className="block text-xs text-slate-500 mb-1">O pegar URL</label>
-                                                            <input
-                                                                type="text"
-                                                                value={newVariantImageUrl}
-                                                                onChange={e => {
-                                                                    setNewVariantImageUrl(e.target.value);
-                                                                    // Clear file input if URL is entered
-                                                                    if (e.target.value) {
-                                                                        setNewVariantImageFile(null);
-                                                                        setVariantImagePreview('');
-                                                                    }
-                                                                }}
-                                                                className="w-full border border-slate-300 rounded p-2 text-xs outline-none focus:border-blue-500"
-                                                                placeholder="https://ejemplo.com/imagen-variante.jpg"
-                                                                disabled={!!newVariantImageFile}
-                                                            />
-                                                        </div>
-                                                        <p className="text-xs text-slate-400">Esta imagen se mostrará cuando el cliente seleccione esta variante</p>
-                                                    </div>
-                                                </div>
-
-                                                {/* Variants List */}
-                                                <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                                                    {productVariants.map((v, idx) => (
-                                                        <div key={v.id || idx} className="bg-white p-3 rounded border border-slate-200 shadow-sm space-y-3">
-                                                            <div className="flex items-center justify-between gap-2">
-                                                                <div className="flex-1 flex items-center gap-2">
-                                                                    <div className="flex-1">
-                                                                        <label className="block text-xs text-slate-500 mb-1">Nombre</label>
-                                                                        <input
-                                                                            type="text"
-                                                                            value={v.name}
-                                                                            onChange={(e) => {
-                                                                                const newVars = [...productVariants];
-                                                                                newVars[idx].name = e.target.value;
-                                                                                setProductVariants(newVars);
-                                                                            }}
-                                                                            className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm outline-none focus:border-blue-500"
-                                                                            placeholder="Nombre de variante"
-                                                                        />
-                                                                    </div>
-                                                                    <div className="w-28">
-                                                                        <label htmlFor={`variant_price_${idx}`} className="block text-xs text-slate-500 mb-1">Precio</label>
-                                                                        <input
-                                                                            id={`variant_price_${idx}`}
-                                                                            type="number"
-                                                                            step="0.01"
-                                                                            min="0.01"
-                                                                            value={isNaN(v.price) ? '' : v.price}
-                                                                            onChange={(e) => {
-                                                                                const newVars = [...productVariants];
-                                                                                newVars[idx].price = e.target.value === '' ? NaN : parseFloat(e.target.value);
-                                                                                setProductVariants(newVars);
-                                                                            }}
-                                                                            className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm outline-none focus:border-blue-500"
-                                                                        />
-                                                                    </div>
-                                                                    <div className="w-24">
-                                                                        <label htmlFor={`variant_stock_${idx}`} className="block text-xs text-slate-500 mb-1">Stock</label>
-                                                                        <input
-                                                                            id={`variant_stock_${idx}`}
-                                                                            type="number"
-                                                                            min="0"
-                                                                            value={isNaN(v.stock) ? '' : v.stock}
-                                                                            onChange={(e) => {
-                                                                                const newVars = [...productVariants];
-                                                                                newVars[idx].stock = e.target.value === '' ? NaN : parseInt(e.target.value);
-                                                                                setProductVariants(newVars);
-                                                                            }}
-                                                                            className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm outline-none focus:border-blue-500"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex items-end gap-2 pb-1">
-                                                                    <label className="flex items-center gap-1.5 cursor-pointer bg-slate-50 px-2 py-1.5 rounded border border-slate-100 hover:bg-slate-100 transition-colors">
-                                                                        <div className={`w-2 h-2 rounded-full ${v.active ? 'bg-green-500' : 'bg-slate-300'}`}></div>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            checked={v.active}
-                                                                            onChange={() => toggleVariantActive(idx)}
-                                                                            className="hidden"
-                                                                        />
-                                                                        <span className={`text-xs font-medium ${v.active ? 'text-green-700' : 'text-slate-500'}`}>
-                                                                            {v.active ? 'Activo' : 'Inactivo'}
-                                                                        </span>
-                                                                    </label>
-                                                                    <button type="button" onClick={() => removeVariant(idx)} className="text-slate-400 hover:text-red-500 transition-colors p-1.5" aria-label="Eliminar variante">
-                                                                        <Trash2 className="w-4 h-4" />
+                                                            </div>
+                                                            <div className="w-32">
+                                                                <label htmlFor="new_variant_sku" className="block text-xs text-slate-500 mb-1">SKU (Opcional)</label>
+                                                                <div className="flex gap-1">
+                                                                    <input
+                                                                        id="new_variant_sku"
+                                                                        type="text"
+                                                                        value={newVariantSku}
+                                                                        onChange={e => setNewVariantSku(e.target.value.toUpperCase())}
+                                                                        className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500 uppercase font-mono"
+                                                                        placeholder="SKU-VAR"
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={generateVariantSKU}
+                                                                        className="p-2 bg-slate-100 hover:bg-slate-200 rounded text-slate-600 transition-colors"
+                                                                        title="Generar SKU basado en Producto"
+                                                                    >
+                                                                        <Upload className="w-4 h-4 rotate-90" />
                                                                     </button>
                                                                 </div>
                                                             </div>
-                                                            <div className="space-y-2 pt-2 border-t border-slate-100">
-                                                                <label className="block text-xs font-semibold text-slate-600">Imagen de Variante</label>
+                                                            <div className="w-24">
+                                                                <label htmlFor="new_variant_stock" className="block text-xs text-slate-500 mb-1">Stock</label>
+                                                                <input
+                                                                    id="new_variant_stock"
+                                                                    type="number"
+                                                                    min="0"
+                                                                    value={newVariantStock}
+                                                                    onChange={e => setNewVariantStock(e.target.value === '' ? '' : parseInt(e.target.value))}
+                                                                    className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-blue-500"
+                                                                />
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                size="sm"
+                                                                onClick={handleAddVariant}
+                                                                className="mb-[1px]"
+                                                                disabled={isUploading}
+                                                            >
+                                                                {isUploading ? 'Subiendo...' : 'Agregar'}
+                                                            </Button>
+                                                        </div>
 
-                                                                {/* File Upload Option */}
-                                                                <div className="flex gap-2 items-start">
-                                                                    <div className="flex-1">
-                                                                        <label htmlFor={`variant_file_${idx}`} className="block text-xs text-slate-500 mb-1">Subir Archivo</label>
-                                                                        <input
-                                                                            id={`variant_file_${idx}`}
-                                                                            type="file"
-                                                                            accept="image/jpeg,image/jpg,image/png,image/webp"
-                                                                            onChange={async (e) => {
-                                                                                const file = e.target.files?.[0];
-                                                                                if (file) {
-                                                                                    setIsUploading(true);
-                                                                                    const uploadedUrl = await uploadProductImage(file);
-                                                                                    setIsUploading(false);
-                                                                                    if (uploadedUrl) {
-                                                                                        const newVars = [...productVariants];
-                                                                                        newVars[idx].image_url = uploadedUrl;
-                                                                                        setProductVariants(newVars);
-                                                                                    } else {
-                                                                                        alert('Error al subir la imagen de la variante.');
-                                                                                    }
-                                                                                }
-                                                                            }}
-                                                                            className="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                                                            disabled={isUploading}
-                                                                        />
-                                                                    </div>
-                                                                    {v.image_url && (
-                                                                        <img src={v.image_url} alt={v.name} className="w-12 h-12 object-cover rounded border border-slate-200 mt-5" />
-                                                                    )}
-                                                                </div>
+                                                        {/* Image Upload Options */}
+                                                        <div className="space-y-2">
+                                                            <label className="block text-xs font-semibold text-slate-600">Imagen de Variante</label>
 
-                                                                {/* URL Option */}
-                                                                <div>
-                                                                    <label className="block text-xs text-slate-500 mb-1">O pegar URL</label>
+                                                            {/* File Upload Option */}
+                                                            <div className="flex gap-2 items-start">
+                                                                <div className="flex-1">
+                                                                    <label htmlFor="new_variant_image_file" className="block text-xs text-slate-500 mb-1">Subir Archivo</label>
                                                                     <input
-                                                                        type="text"
-                                                                        value={v.image_url || ''}
+                                                                        id="new_variant_image_file"
+                                                                        type="file"
+                                                                        accept="image/jpeg,image/jpg,image/png,image/webp"
                                                                         onChange={(e) => {
-                                                                            const newVars = [...productVariants];
-                                                                            newVars[idx].image_url = e.target.value || undefined;
-                                                                            setProductVariants(newVars);
+                                                                            const file = e.target.files?.[0];
+                                                                            if (file) {
+                                                                                setNewVariantImageFile(file);
+                                                                                const reader = new FileReader();
+                                                                                reader.onloadend = () => {
+                                                                                    setVariantImagePreview(reader.result as string);
+                                                                                };
+                                                                                reader.readAsDataURL(file);
+                                                                                // Clear URL input if file is selected
+                                                                                setNewVariantImageUrl('');
+                                                                            }
                                                                         }}
-                                                                        className="w-full border border-slate-300 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500"
-                                                                        placeholder="https://ejemplo.com/imagen-variante.jpg"
+                                                                        className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                                                     />
                                                                 </div>
+                                                                {(variantImagePreview || newVariantImageUrl) && (
+                                                                    <img
+                                                                        src={variantImagePreview || newVariantImageUrl}
+                                                                        alt="Preview"
+                                                                        className="w-12 h-12 object-cover rounded border border-slate-200"
+                                                                    />
+                                                                )}
                                                             </div>
+
+                                                            {/* URL Option */}
+                                                            <div>
+                                                                <label className="block text-xs text-slate-500 mb-1">O pegar URL</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={newVariantImageUrl}
+                                                                    onChange={e => {
+                                                                        setNewVariantImageUrl(e.target.value);
+                                                                        // Clear file input if URL is entered
+                                                                        if (e.target.value) {
+                                                                            setNewVariantImageFile(null);
+                                                                            setVariantImagePreview('');
+                                                                        }
+                                                                    }}
+                                                                    className="w-full border border-slate-300 rounded p-2 text-xs outline-none focus:border-blue-500"
+                                                                    placeholder="https://ejemplo.com/imagen-variante.jpg"
+                                                                    disabled={!!newVariantImageFile}
+                                                                />
+                                                            </div>
+                                                            <p className="text-xs text-slate-400">Esta imagen se mostrará cuando el cliente seleccione esta variante</p>
                                                         </div>
-                                                    ))}
-                                                    {productVariants.length === 0 && (
-                                                        <p className="text-xs text-slate-400 italic text-center py-2 bg-slate-50/50 rounded dashed border border-slate-200">
-                                                            No hay variantes agregadas para este tipo.
-                                                        </p>
-                                                    )}
+                                                    </div>
+
+                                                    {/* Variants List */}
+                                                    <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                                                        {productVariants.map((v, idx) => (
+                                                            <div key={v.id || idx} className="bg-white p-3 rounded border border-slate-200 shadow-sm space-y-3">
+                                                                <div className="flex items-center justify-between gap-2">
+                                                                    <div className="flex-1 flex items-center gap-2">
+                                                                        <div className="flex-1">
+                                                                            <label className="block text-xs text-slate-500 mb-1">Nombre</label>
+                                                                            <input
+                                                                                type="text"
+                                                                                value={v.name}
+                                                                                onChange={(e) => {
+                                                                                    const newVars = [...productVariants];
+                                                                                    newVars[idx].name = e.target.value;
+                                                                                    setProductVariants(newVars);
+                                                                                }}
+                                                                                className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm outline-none focus:border-blue-500"
+                                                                                placeholder="Nombre de variante"
+                                                                            />
+                                                                        </div>
+                                                                        <div className="w-28">
+                                                                            <label htmlFor={`variant_price_${idx}`} className="block text-xs text-slate-500 mb-1">Precio</label>
+                                                                            <input
+                                                                                id={`variant_price_${idx}`}
+                                                                                type="number"
+                                                                                step="0.01"
+                                                                                min="0.01"
+                                                                                value={isNaN(v.price) ? '' : v.price}
+                                                                                onChange={(e) => {
+                                                                                    const newVars = [...productVariants];
+                                                                                    newVars[idx].price = e.target.value === '' ? NaN : parseFloat(e.target.value);
+                                                                                    setProductVariants(newVars);
+                                                                                }}
+                                                                                className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm outline-none focus:border-blue-500"
+                                                                            />
+                                                                        </div>
+                                                                        <div className="w-24">
+                                                                            <label htmlFor={`variant_stock_${idx}`} className="block text-xs text-slate-500 mb-1">Stock</label>
+                                                                            <input
+                                                                                id={`variant_stock_${idx}`}
+                                                                                type="number"
+                                                                                min="0"
+                                                                                value={isNaN(v.stock) ? '' : v.stock}
+                                                                                onChange={(e) => {
+                                                                                    const newVars = [...productVariants];
+                                                                                    newVars[idx].stock = e.target.value === '' ? NaN : parseInt(e.target.value);
+                                                                                    setProductVariants(newVars);
+                                                                                }}
+                                                                                className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm outline-none focus:border-blue-500"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex items-end gap-2 pb-1">
+                                                                        <label className="flex items-center gap-1.5 cursor-pointer bg-slate-50 px-2 py-1.5 rounded border border-slate-100 hover:bg-slate-100 transition-colors">
+                                                                            <div className={`w-2 h-2 rounded-full ${v.active ? 'bg-green-500' : 'bg-slate-300'}`}></div>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={v.active}
+                                                                                onChange={() => toggleVariantActive(idx)}
+                                                                                className="hidden"
+                                                                            />
+                                                                            <span className={`text-xs font-medium ${v.active ? 'text-green-700' : 'text-slate-500'}`}>
+                                                                                {v.active ? 'Activo' : 'Inactivo'}
+                                                                            </span>
+                                                                        </label>
+                                                                        <button type="button" onClick={() => removeVariant(idx)} className="text-slate-400 hover:text-red-500 transition-colors p-1.5" aria-label="Eliminar variante">
+                                                                            <Trash2 className="w-4 h-4" />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="space-y-2 pt-2 border-t border-slate-100">
+                                                                    <label className="block text-xs font-semibold text-slate-600">Imagen de Variante</label>
+
+                                                                    {/* File Upload Option */}
+                                                                    <div className="flex gap-2 items-start">
+                                                                        <div className="flex-1">
+                                                                            <label htmlFor={`variant_file_${idx}`} className="block text-xs text-slate-500 mb-1">Subir Archivo</label>
+                                                                            <input
+                                                                                id={`variant_file_${idx}`}
+                                                                                type="file"
+                                                                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                                                onChange={async (e) => {
+                                                                                    const file = e.target.files?.[0];
+                                                                                    if (file) {
+                                                                                        setIsUploading(true);
+                                                                                        const uploadedUrl = await uploadProductImage(file);
+                                                                                        setIsUploading(false);
+                                                                                        if (uploadedUrl) {
+                                                                                            const newVars = [...productVariants];
+                                                                                            newVars[idx].image_url = uploadedUrl;
+                                                                                            setProductVariants(newVars);
+                                                                                        } else {
+                                                                                            alert('Error al subir la imagen de la variante.');
+                                                                                        }
+                                                                                    }
+                                                                                }}
+                                                                                className="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                                                                disabled={isUploading}
+                                                                            />
+                                                                        </div>
+                                                                        {v.image_url && (
+                                                                            <img src={v.image_url} alt={v.name} className="w-12 h-12 object-cover rounded border border-slate-200 mt-5" />
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* URL Option */}
+                                                                    <div>
+                                                                        <label className="block text-xs text-slate-500 mb-1">O pegar URL</label>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={v.image_url || ''}
+                                                                            onChange={(e) => {
+                                                                                const newVars = [...productVariants];
+                                                                                newVars[idx].image_url = e.target.value || undefined;
+                                                                                setProductVariants(newVars);
+                                                                            }}
+                                                                            className="w-full border border-slate-300 rounded px-2 py-1.5 text-xs outline-none focus:border-blue-500"
+                                                                            placeholder="https://ejemplo.com/imagen-variante.jpg"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        {productVariants.length === 0 && (
+                                                            <p className="text-xs text-slate-400 italic text-center py-2 bg-slate-50/50 rounded dashed border border-slate-200">
+                                                                No hay variantes agregadas para este tipo.
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* IMAGE UPLOAD SECTION */}
+                                    <div className="col-span-2 space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="checkbox"
+                                                id="useFileUpload"
+                                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                                                checked={useFileUpload}
+                                                onChange={e => setUseFileUpload(e.target.checked)}
+                                            />
+                                            <label htmlFor="useFileUpload" className="text-sm font-bold text-slate-700">Subir imagen desde mi dispositivo</label>
+                                        </div>
+
+                                        {useFileUpload ? (
+                                            <div className="pl-8 space-y-3">
+                                                <div>
+                                                    <label htmlFor="product_image_file" className="block text-sm font-medium text-slate-600 mb-2">Seleccionar archivo</label>
+                                                    <input
+                                                        id="product_image_file"
+                                                        type="file"
+                                                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                        onChange={handleFileSelect}
+                                                        className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                                    />
+                                                    <p className="text-xs text-slate-400 mt-1">JPG, PNG o WEBP. Máximo 5MB.</p>
+                                                </div>
+                                                {imagePreview && (
+                                                    <div className="mt-3">
+                                                        <p className="text-sm font-medium text-slate-600 mb-2">Vista previa:</p>
+                                                        <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded-lg border border-slate-200" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="pl-8">
+                                                <label className="block text-sm font-medium text-slate-600 mb-1">URL de Imagen</label>
+                                                <input
+                                                    required={!useFileUpload}
+                                                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                                    value={formData.image_url || ''}
+                                                    onChange={e => {
+                                                        setFormData({ ...formData, image_url: e.target.value });
+                                                        setImagePreview(e.target.value);
+                                                    }}
+                                                    placeholder="https://..."
+                                                />
+                                                {imagePreview && (
+                                                    <div className="mt-3">
+                                                        <p className="text-sm font-medium text-slate-600 mb-2">Vista previa:</p>
+                                                        <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded-lg border border-slate-200" />
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
-                                </div>
 
-                                {/* IMAGE UPLOAD SECTION */}
-                                <div className="col-span-2 space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                    <div className="flex items-center gap-3">
-                                        <input
-                                            type="checkbox"
-                                            id="useFileUpload"
-                                            className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
-                                            checked={useFileUpload}
-                                            onChange={e => setUseFileUpload(e.target.checked)}
-                                        />
-                                        <label htmlFor="useFileUpload" className="text-sm font-bold text-slate-700">Subir imagen desde mi dispositivo</label>
-                                    </div>
+                                    {/* ADDITIONAL IMAGES SECTION */}
+                                    <div className="col-span-2 space-y-3 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-100">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-sm font-bold text-slate-700">
+                                                Imágenes Adicionales (Galería)
+                                            </label>
+                                            <span className="text-xs text-slate-500">{additionalPreviews.length} imagen(es)</span>
+                                        </div>
 
-                                    {useFileUpload ? (
-                                        <div className="pl-8 space-y-3">
+                                        <div className="space-y-3">
                                             <div>
-                                                <label htmlFor="product_image_file" className="block text-sm font-medium text-slate-600 mb-2">Seleccionar archivo</label>
+                                                <label htmlFor="additional_images_file" className="block text-sm font-medium text-slate-600 mb-2">
+                                                    Agregar más imágenes
+                                                </label>
                                                 <input
-                                                    id="product_image_file"
+                                                    id="additional_images_file"
                                                     type="file"
                                                     accept="image/jpeg,image/jpg,image/png,image/webp"
-                                                    onChange={handleFileSelect}
+                                                    multiple
+                                                    onChange={(e) => {
+                                                        const files = e.target.files;
+                                                        if (files && files.length > 0) {
+                                                            const newFiles = Array.from<File>(files);
+                                                            setAdditionalFiles(prev => [...prev, ...newFiles]);
+
+                                                            // Create previews
+                                                            newFiles.forEach(file => {
+                                                                const reader = new FileReader();
+                                                                reader.onloadend = () => {
+                                                                    setAdditionalPreviews(prev => [...prev, reader.result as string]);
+                                                                };
+                                                                reader.readAsDataURL(file);
+                                                            });
+                                                        }
+                                                        // Reset input
+                                                        e.target.value = '';
+                                                    }}
                                                     className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                                 />
-                                                <p className="text-xs text-slate-400 mt-1">JPG, PNG o WEBP. Máximo 5MB.</p>
+                                                <p className="text-xs text-slate-400 mt-1">Puedes seleccionar múltiples archivos. JPG, PNG o WEBP.</p>
                                             </div>
-                                            {imagePreview && (
-                                                <div className="mt-3">
-                                                    <p className="text-sm font-medium text-slate-600 mb-2">Vista previa:</p>
-                                                    <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded-lg border border-slate-200" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="pl-8">
-                                            <label className="block text-sm font-medium text-slate-600 mb-1">URL de Imagen</label>
-                                            <input
-                                                required={!useFileUpload}
-                                                className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                                                value={formData.image_url || ''}
-                                                onChange={e => {
-                                                    setFormData({ ...formData, image_url: e.target.value });
-                                                    setImagePreview(e.target.value);
-                                                }}
-                                                placeholder="https://..."
-                                            />
-                                            {imagePreview && (
-                                                <div className="mt-3">
-                                                    <p className="text-sm font-medium text-slate-600 mb-2">Vista previa:</p>
-                                                    <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover rounded-lg border border-slate-200" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
 
-                                {/* ADDITIONAL IMAGES SECTION */}
-                                <div className="col-span-2 space-y-3 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-100">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-sm font-bold text-slate-700">
-                                            Imágenes Adicionales (Galería)
-                                        </label>
-                                        <span className="text-xs text-slate-500">{additionalPreviews.length} imagen(es)</span>
+                                            {additionalPreviews.length > 0 && (
+                                                <div className="grid grid-cols-4 gap-3">
+                                                    {additionalPreviews.map((preview, idx) => (
+                                                        <div key={idx} className="relative group">
+                                                            <img
+                                                                src={preview}
+                                                                alt={`Adicional ${idx + 1}`}
+                                                                className="w-full h-20 object-cover rounded-lg border border-slate-200"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setAdditionalPreviews(prev => prev.filter((_, i) => i !== idx));
+                                                                    // Also remove from files if it's a new file (data: URL)
+                                                                    if (preview.startsWith('data:')) {
+                                                                        const dataUrlIndex = additionalPreviews.slice(0, idx).filter(p => p.startsWith('data:')).length;
+                                                                        setAdditionalFiles(prev => prev.filter((_, i) => i !== dataUrlIndex));
+                                                                    }
+                                                                }}
+                                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div>
-                                            <label htmlFor="additional_images_file" className="block text-sm font-medium text-slate-600 mb-2">
-                                                Agregar más imágenes
-                                            </label>
-                                            <input
-                                                id="additional_images_file"
-                                                type="file"
-                                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                                multiple
-                                                onChange={(e) => {
-                                                    const files = e.target.files;
-                                                    if (files && files.length > 0) {
-                                                        const newFiles = Array.from<File>(files);
-                                                        setAdditionalFiles(prev => [...prev, ...newFiles]);
+                                    <div className="col-span-2">
+                                        <label htmlFor="product_description" className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                                        <textarea
+                                            id="product_description"
+                                            rows={3}
+                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={formData.description || ''}
+                                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                        ></textarea>
+                                    </div>
 
-                                                        // Create previews
-                                                        newFiles.forEach(file => {
-                                                            const reader = new FileReader();
-                                                            reader.onloadend = () => {
-                                                                setAdditionalPreviews(prev => [...prev, reader.result as string]);
-                                                            };
-                                                            reader.readAsDataURL(file);
-                                                        });
-                                                    }
-                                                    // Reset input
-                                                    e.target.value = '';
-                                                }}
-                                                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    <div className="col-span-2 space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="checkbox"
+                                                id="hasColors"
+                                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                                                checked={hasColors}
+                                                onChange={e => setHasColors(e.target.checked)}
                                             />
-                                            <p className="text-xs text-slate-400 mt-1">Puedes seleccionar múltiples archivos. JPG, PNG o WEBP.</p>
+                                            <label htmlFor="hasColors" className="text-sm font-bold text-slate-700">Este producto tiene variantes de color</label>
                                         </div>
 
-                                        {additionalPreviews.length > 0 && (
-                                            <div className="grid grid-cols-4 gap-3">
-                                                {additionalPreviews.map((preview, idx) => (
-                                                    <div key={idx} className="relative group">
-                                                        <img
-                                                            src={preview}
-                                                            alt={`Adicional ${idx + 1}`}
-                                                            className="w-full h-20 object-cover rounded-lg border border-slate-200"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setAdditionalPreviews(prev => prev.filter((_, i) => i !== idx));
-                                                                // Also remove from files if it's a new file (data: URL)
-                                                                if (preview.startsWith('data:')) {
-                                                                    const dataUrlIndex = additionalPreviews.slice(0, idx).filter(p => p.startsWith('data:')).length;
-                                                                    setAdditionalFiles(prev => prev.filter((_, i) => i !== dataUrlIndex));
-                                                                }
-                                                            }}
-                                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                ))}
+                                        {hasColors && (
+                                            <div className="animate-fade-in pl-8">
+                                                <label className="block text-sm font-medium text-slate-600 mb-1">Colores (separados por coma)</label>
+                                                <input
+                                                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                                    value={formColors}
+                                                    onChange={e => setFormColors(e.target.value)}
+                                                    placeholder="Ej: Rojo, Azul Marino, Negro"
+                                                />
+                                                <p className="text-xs text-slate-400 mt-1">Escribe los nombres de los colores disponibles.</p>
                                             </div>
                                         )}
                                     </div>
-                                </div>
 
-                                <div className="col-span-2">
-                                    <label htmlFor="product_description" className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-                                    <textarea
-                                        id="product_description"
-                                        rows={3}
-                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        value={formData.description || ''}
-                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    ></textarea>
-                                </div>
-
-                                <div className="col-span-2 space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                    <div className="flex items-center gap-3">
+                                    <div className="col-span-2 flex items-center gap-3">
                                         <input
                                             type="checkbox"
-                                            id="hasColors"
+                                            id="featured"
                                             className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
-                                            checked={hasColors}
-                                            onChange={e => setHasColors(e.target.checked)}
+                                            checked={formData.featured || false}
+                                            onChange={e => setFormData({ ...formData, featured: e.target.checked })}
                                         />
-                                        <label htmlFor="hasColors" className="text-sm font-bold text-slate-700">Este producto tiene variantes de color</label>
+                                        <label htmlFor="featured" className="text-sm font-medium text-slate-700">Producto Destacado (aparecerá primero)</label>
                                     </div>
 
-                                    {hasColors && (
-                                        <div className="animate-fade-in pl-8">
-                                            <label className="block text-sm font-medium text-slate-600 mb-1">Colores (separados por coma)</label>
+                                    <div className="col-span-2 flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200">
+                                        <div className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.active !== false ? 'bg-green-500' : 'bg-slate-300'}`}>
                                             <input
-                                                className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                                                value={formColors}
-                                                onChange={e => setFormColors(e.target.value)}
-                                                placeholder="Ej: Rojo, Azul Marino, Negro"
+                                                id="product_active"
+                                                type="checkbox"
+                                                className="sr-only"
+                                                checked={formData.active !== false}
+                                                onChange={e => setFormData({ ...formData, active: e.target.checked })}
+                                                aria-label="Producto activo o inactivo"
                                             />
-                                            <p className="text-xs text-slate-400 mt-1">Escribe los nombres de los colores disponibles.</p>
+                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.active !== false ? 'translate-x-6' : 'translate-x-1'}`} />
                                         </div>
-                                    )}
-                                </div>
-
-                                <div className="col-span-2 flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        id="featured"
-                                        className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
-                                        checked={formData.featured || false}
-                                        onChange={e => setFormData({ ...formData, featured: e.target.checked })}
-                                    />
-                                    <label htmlFor="featured" className="text-sm font-medium text-slate-700">Producto Destacado (aparecerá primero)</label>
-                                </div>
-
-                                <div className="col-span-2 flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-200">
-                                    <div className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.active !== false ? 'bg-green-500' : 'bg-slate-300'}`}>
-                                        <input
-                                            id="product_active"
-                                            type="checkbox"
-                                            className="sr-only"
-                                            checked={formData.active !== false}
-                                            onChange={e => setFormData({ ...formData, active: e.target.checked })}
-                                            aria-label="Producto activo o inactivo"
-                                        />
-                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.active !== false ? 'translate-x-6' : 'translate-x-1'}`} />
+                                        <label className="text-sm font-bold text-slate-700">
+                                            Producto Activo / Visible
+                                            <span className="block text-xs font-normal text-slate-500">Si está desactivado, no aparecerá en el catálogo público.</span>
+                                        </label>
                                     </div>
-                                    <label className="text-sm font-bold text-slate-700">
-                                        Producto Activo / Visible
-                                        <span className="block text-xs font-normal text-slate-500">Si está desactivado, no aparecerá en el catálogo público.</span>
-                                    </label>
                                 </div>
+
+                                <div className="pt-4 flex justify-between items-center">
+                                    <div>
+                                        {editingProduct && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                onClick={() => handleDeleteProduct(editingProduct.id)}
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                Eliminar Producto
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button type="button" variant="ghost" onClick={() => setIsProductModalOpen(false)}>Cancelar</Button>
+                                        <Button type="submit" disabled={isUploading}>
+                                            {isUploading ? (
+                                                <>
+                                                    <Upload className="w-4 h-4 mr-2 animate-spin" />
+                                                    Subiendo...
+                                                </>
+                                            ) : (
+                                                'Guardar Producto'
+                                            )}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* CATEGORY MODAL */}
+            {
+                isCategoryModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                                <h3 className="text-xl font-bold">{editingCategory ? 'Editar Categoría' : 'Crear Nueva Categoría'}</h3>
+                                <button onClick={() => setIsCategoryModalOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Cerrar modal">
+                                    <XCircle className="w-6 h-6" />
+                                </button>
                             </div>
 
-                            <div className="pt-4 flex justify-between items-center">
+                            <form onSubmit={handleCategorySubmit} className="p-6 space-y-4">
                                 <div>
-                                    {editingProduct && (
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            className="text-red-500 hover:bg-red-50 hover:text-red-700"
-                                            onClick={() => handleDeleteProduct(editingProduct.id)}
-                                        >
-                                            <Trash2 className="w-4 h-4 mr-2" />
-                                            Eliminar Producto
-                                        </Button>
-                                    )}
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+                                    <input
+                                        required
+                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        value={categoryFormData.name || ''}
+                                        onChange={e => setCategoryFormData({ ...categoryFormData, name: e.target.value })}
+                                        placeholder="Ej: Botones"
+                                    />
                                 </div>
-                                <div className="flex gap-3">
-                                    <Button type="button" variant="ghost" onClick={() => setIsProductModalOpen(false)}>Cancelar</Button>
-                                    <Button type="submit" disabled={isUploading}>
-                                        {isUploading ? (
-                                            <>
-                                                <Upload className="w-4 h-4 mr-2 animate-spin" />
-                                                Subiendo...
-                                            </>
-                                        ) : (
-                                            'Guardar Producto'
-                                        )}
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Slug (URL amigable)</label>
+                                    <input
+                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        value={categoryFormData.slug || ''}
+                                        onChange={e => setCategoryFormData({ ...categoryFormData, slug: e.target.value })}
+                                        placeholder="Ej: botones (se genera automáticamente)"
+                                    />
+                                    <p className="text-xs text-slate-400 mt-1">Si se deja vacío, se generará automáticamente del nombre.</p>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="category_parent_id" className="block text-sm font-medium text-slate-700 mb-1">Categoría Padre (Opcional)</label>
+                                    <select
+                                        id="category_parent_id"
+                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        value={categoryFormData.parent_id || ''}
+                                        onChange={e => setCategoryFormData({ ...categoryFormData, parent_id: e.target.value || undefined })}
+                                    >
+                                        <option value="">Ninguna (Categoría principal)</option>
+                                        {categories
+                                            .filter(c => !c.parent_id && (!editingCategory || c.id !== editingCategory.id))
+                                            .map(parent => (
+                                                <option key={parent.id} value={parent.id}>{parent.name}</option>
+                                            ))
+                                        }
+                                    </select>
+                                    <p className="text-xs text-slate-400 mt-1">Selecciona una categoría padre si esta es una subcategoría.</p>
+                                </div>
+
+                                <div className="pt-4 flex justify-end gap-3">
+                                    <Button type="button" variant="ghost" onClick={() => setIsCategoryModalOpen(false)}>Cancelar</Button>
+                                    <Button type="submit">Guardar Categoría</Button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )
+            }
+            {/* BULK EDIT MODAL */}
+            {
+                isBulkEditModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                                <h3 className="text-xl font-bold">Edición Masiva</h3>
+                                <button onClick={() => setIsBulkEditModalOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Cerrar modal">
+                                    <XCircle className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4">
+                                    <p className="text-sm text-blue-800">
+                                        Estás editando <span className="font-bold">{selectedProductIds.size}</span> productos seleccionados.
+                                    </p>
+                                    <p className="text-xs text-blue-600 mt-1">
+                                        Solo se actualizarán los campos que modifiques a continuación.
+                                    </p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Categoría (Opcional)</label>
+                                        <select
+                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={bulkEditData.category_id || ''}
+                                            onChange={e => setBulkEditData({ ...bulkEditData, category_id: e.target.value })}
+                                        >
+                                            <option value="">Mantener original</option>
+                                            {categories.map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Nuevo Precio (Opcional)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0.01"
+                                            placeholder="Mantener original"
+                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={bulkEditData.price ?? ''}
+                                            onChange={e => setBulkEditData({ ...bulkEditData, price: parseNumberInput(e.target.value) })}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Color de Herraje (Opcional)</label>
+                                        <select
+                                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={bulkEditData.hardware_color || ''}
+                                            onChange={e => setBulkEditData({ ...bulkEditData, hardware_color: e.target.value as 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | '' })}
+                                        >
+                                            <option value="">Mantener original</option>
+                                            <option value="Dorado">Dorado</option>
+                                            <option value="Plata">Plata</option>
+                                            <option value="GoldenRose">GoldenRose</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
+                                        <p className="text-xs text-slate-400 mt-1">Solo aplica para productos de herrajes.</p>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 flex justify-end gap-3">
+                                    <Button type="button" variant="ghost" onClick={() => setIsBulkEditModalOpen(false)}>Cancelar</Button>
+                                    <Button
+                                        type="button"
+                                        onClick={handleBulkUpdate}
+                                        disabled={isUploading || (!bulkEditData.category_id && bulkEditData.price === undefined && !bulkEditData.hardware_color)}
+                                    >
+                                        {isUploading ? 'Actualizando...' : 'Aplicar a Todos'}
                                     </Button>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* CATEGORY MODAL */}
-            {isCategoryModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h3 className="text-xl font-bold">{editingCategory ? 'Editar Categoría' : 'Crear Nueva Categoría'}</h3>
-                            <button onClick={() => setIsCategoryModalOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Cerrar modal">
-                                <XCircle className="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleCategorySubmit} className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
-                                <input
-                                    required
-                                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                    value={categoryFormData.name || ''}
-                                    onChange={e => setCategoryFormData({ ...categoryFormData, name: e.target.value })}
-                                    placeholder="Ej: Botones"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Slug (URL amigable)</label>
-                                <input
-                                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                    value={categoryFormData.slug || ''}
-                                    onChange={e => setCategoryFormData({ ...categoryFormData, slug: e.target.value })}
-                                    placeholder="Ej: botones (se genera automáticamente)"
-                                />
-                                <p className="text-xs text-slate-400 mt-1">Si se deja vacío, se generará automáticamente del nombre.</p>
-                            </div>
-
-                            <div>
-                                <label htmlFor="category_parent_id" className="block text-sm font-medium text-slate-700 mb-1">Categoría Padre (Opcional)</label>
-                                <select
-                                    id="category_parent_id"
-                                    className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                    value={categoryFormData.parent_id || ''}
-                                    onChange={e => setCategoryFormData({ ...categoryFormData, parent_id: e.target.value || undefined })}
-                                >
-                                    <option value="">Ninguna (Categoría principal)</option>
-                                    {categories
-                                        .filter(c => !c.parent_id && (!editingCategory || c.id !== editingCategory.id))
-                                        .map(parent => (
-                                            <option key={parent.id} value={parent.id}>{parent.name}</option>
-                                        ))
-                                    }
-                                </select>
-                                <p className="text-xs text-slate-400 mt-1">Selecciona una categoría padre si esta es una subcategoría.</p>
-                            </div>
-
-                            <div className="pt-4 flex justify-end gap-3">
-                                <Button type="button" variant="ghost" onClick={() => setIsCategoryModalOpen(false)}>Cancelar</Button>
-                                <Button type="submit">Guardar Categoría</Button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-            {/* BULK EDIT MODAL */}
-            {isBulkEditModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h3 className="text-xl font-bold">Edición Masiva</h3>
-                            <button onClick={() => setIsBulkEditModalOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Cerrar modal">
-                                <XCircle className="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        <div className="p-6 space-y-6">
-                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4">
-                                <p className="text-sm text-blue-800">
-                                    Estás editando <span className="font-bold">{selectedProductIds.size}</span> productos seleccionados.
-                                </p>
-                                <p className="text-xs text-blue-600 mt-1">
-                                    Solo se actualizarán los campos que modifiques a continuación.
-                                </p>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nueva Categoría (Opcional)</label>
-                                    <select
-                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        value={bulkEditData.category_id || ''}
-                                        onChange={e => setBulkEditData({ ...bulkEditData, category_id: e.target.value })}
-                                    >
-                                        <option value="">Mantener original</option>
-                                        {categories.map(c => (
-                                            <option key={c.id} value={c.id}>{c.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nuevo Precio (Opcional)</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        min="0.01"
-                                        placeholder="Mantener original"
-                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        value={bulkEditData.price ?? ''}
-                                        onChange={e => setBulkEditData({ ...bulkEditData, price: parseNumberInput(e.target.value) })}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Color de Herraje (Opcional)</label>
-                                    <select
-                                        className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                        value={bulkEditData.hardware_color || ''}
-                                        onChange={e => setBulkEditData({ ...bulkEditData, hardware_color: e.target.value as 'Dorado' | 'Plata' | 'GoldenRose' | 'Otros' | '' })}
-                                    >
-                                        <option value="">Mantener original</option>
-                                        <option value="Dorado">Dorado</option>
-                                        <option value="Plata">Plata</option>
-                                        <option value="GoldenRose">GoldenRose</option>
-                                        <option value="Otros">Otros</option>
-                                    </select>
-                                    <p className="text-xs text-slate-400 mt-1">Solo aplica para productos de herrajes.</p>
-                                </div>
-                            </div>
-
-                            <div className="pt-4 flex justify-end gap-3">
-                                <Button type="button" variant="ghost" onClick={() => setIsBulkEditModalOpen(false)}>Cancelar</Button>
-                                <Button
-                                    type="button"
-                                    onClick={handleBulkUpdate}
-                                    disabled={isUploading || (!bulkEditData.category_id && bulkEditData.price === undefined && !bulkEditData.hardware_color)}
-                                >
-                                    {isUploading ? 'Actualizando...' : 'Aplicar a Todos'}
-                                </Button>
-                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div>
     );
 };
